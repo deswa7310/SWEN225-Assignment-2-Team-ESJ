@@ -18,3 +18,8 @@ Due: Monday 9th August
 - What properties of the original code made it hard or easy to add the GUI?
 ### State diagram discussion (25):
 - Describe each state the software might be in.
+
+
+
+### Random notes/ reminders:
+- "Mouse Hover Behaviour" can be done with Swing Tooltip - very easy to do so should to this for extra marks.
