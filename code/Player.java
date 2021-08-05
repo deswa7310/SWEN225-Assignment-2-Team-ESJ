@@ -60,6 +60,11 @@ public class Player {
 
     while (true) {
       Board.displayBoard();
+      
+      //--------------------------------------------------------------------------------------------------------------------
+      Board.gui.repaint(); //should be in game class
+      //--------------------------------------------------------------------------------------------------------------------
+      
       System.out.println(message);
       System.out.println("Available actions:");
       for (String command : commands.keySet())
