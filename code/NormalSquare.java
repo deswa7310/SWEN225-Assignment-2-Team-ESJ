@@ -1,3 +1,6 @@
+import java.awt.Color;
+import java.awt.Graphics;
+
 /**
  * NormalSquare is a subclass of Square representing the majority of squares on the board.
  * GameCharacters can be placed on them.
@@ -20,5 +23,12 @@ public class NormalSquare extends Square {
   @Override
   public String toString(){
     return character == null ? " " : character.toString().substring(0, 1);
+  }
+  
+  @Override
+  public void drawSquare(Graphics g) {
+	  g.setColor(new Color(69,69,69));
+	  g.fillRect((col*SIZE)+WALL+2, (row*SIZE)+WALL+2, SIZE-3, SIZE-3);
+	  
   }
 }
