@@ -1,3 +1,6 @@
+import java.awt.Color;
+import java.awt.EventQueue;
+import java.awt.Graphics;
 import java.util.*;
 
 /**
@@ -6,7 +9,8 @@ import java.util.*;
  * along with managing the game state and turn loop.
  */
 public class Board {
-
+  
+  public static final GUI gui = new GUI();
   /** Grid constants: */
   public static final int ROWS = 24;
   public static final int COLS = 24;
@@ -47,6 +51,47 @@ public class Board {
     dealCards();
     wait(1000);
     startGame();
+  }
+  
+  /*
+   * Gets list of characters. *should be moved to game class*
+   */
+  public static List<GameCharacter> characterList() {
+	  List<GameCharacter> characterList = new ArrayList<>();
+	  for(GameCharacter c : characters.values()) {
+		  characterList.add(c);
+	  }
+	  return Collections.unmodifiableList(characterList);
+  }
+  
+  /*
+   * Gets list of estates. *should be moved to game class*
+   */
+  public static List<Estate> estateList() {
+	  List<Estate> estateList = new ArrayList<>();
+	  for(Estate e : estates.values()) {
+		  estateList.add(e);
+	  }
+	  return Collections.unmodifiableList(estateList);
+  }
+  
+  /*
+   * Draws the grid by calling draw on each square.
+   */
+  public static void drawBoard(Graphics g) {
+	  g.setColor(new Color(56,56,56));
+	  g.fillRect(20, 20, GUI.SIZE-40, GUI.SIZE-40);
+	  //g.fillRect(145, 100, 40, 40);
+	  //g.setColor(black);
+	  //g.fillRect(board);
+	  
+	  for(int row = 0; row < ROWS; row++) {
+		  for(int col = 0; col < COLS; col++) {
+			  Square s = grid[row][col];
+			  s.drawSquare(g);  
+		  }
+	  }
+	  
   }
 
   /**
@@ -311,7 +356,7 @@ public class Board {
 
 
   /**
-   * Starts and controls the main game loop:
+   * Starts and controls the main game loop: *move to game class*
    */
   private static void startGame(){
     // Randomly pick which player starts:
@@ -319,6 +364,8 @@ public class Board {
 
     System.out.println("Starting Game...");
     wait(1000);
+    
+    gui.setVisible(true); //opens GUI window
 
     // Gameplay loop:
     while (!gameOver){
@@ -433,6 +480,11 @@ public class Board {
   }
 
   public static void main(String... args){
-    Board.initBoard();
+	Board.initBoard();
+	//EventQueue.invokeLater(() -> {
+	//GUI gui = new GUI();
+	//gui.setVisible(true);
+	//});
+    
   }
 }
