@@ -1,3 +1,6 @@
+import java.awt.Color;
+import java.awt.Graphics;
+
 /**
  * EstateSquare is a subclass of Square, representing a square within an Estate.
  * They have different properties based on which part of the Estate they are:
@@ -21,6 +24,7 @@ public class EstateSquare extends Square {
   private Estate.Side side;
   /** The square directly outside this entrance (only applies to entrances). */
   private NormalSquare outerSquare;
+  
 
 
   /**
@@ -73,4 +77,38 @@ public class EstateSquare extends Square {
     if (c == null) return " ";
     return String.valueOf(c.initial);
   }
+  
+  @Override
+  public void drawSquare(Graphics g) { //TO DO: draw enterance and walls
+	  char in = estate.initial;
+	  //Color c = null;
+	  switch (in) {
+	  	case 'h':
+	  		g.setColor(new Color(130,209,172));
+	  		//c = new Color(130,209,172);
+	  		break;
+	  	case 'm':
+	  		g.setColor(new Color(224,228,173));
+	  		//c = new Color(224,228,173);
+	  		break;
+	  	case 'v':
+	  		g.setColor(new Color(228,166,40));
+	  		//c = new Color(228,166,40);
+	  		break;
+	  	case 'c':
+	  		g.setColor(new Color(211,120,41));
+	  		//c = new Color(211,120,41);
+	  		break;
+	  	default:
+	  		g.setColor(new Color(123,91,83));
+	  		//c = new Color(123,91,83);
+	  }
+	  
+	  //g.setColor(c);
+	  g.fillRect((col*SIZE)+WALL, (row*SIZE)+WALL, SIZE, SIZE);
+//	  if(side != null || index == -1) {
+//		  drawSide(g);
+//	  } 
+  }
+  
 }
