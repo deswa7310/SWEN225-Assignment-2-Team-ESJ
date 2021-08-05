@@ -1,3 +1,4 @@
+import java.awt.Graphics;
 import java.util.*;
 
 /**
@@ -50,4 +51,88 @@ public class Estate extends Card {
   public void removeContents(Card c){ contents.remove(c); }
   /** Gets the Card within the Estate's contents at the specified index: */
   public Card getContents(int index){ return (index < contents.size() ? contents.get(index) : null); }
+  
+  
+  /**
+   * Column positioning of contents. Used when drawn.
+   * @return
+   */
+  public int leftCol() {
+	  char init = this.initial;
+	  switch(init) {
+	  	case 'h':	
+	  	case 'c':
+	  		return 2;
+	  	case 'p':
+	  	case 'm':
+	  		return 17;
+	  	default:
+	  		return 10;
+	  }
+  }
+  
+  /**
+   * Row positioning of characters. used when drawn.
+   * @return
+   */
+  public int charRow() {
+	  char init = this.initial;
+	  switch(init) {
+	  	case 'h':	
+	  	case 'm':
+	  		return 4;
+	  	case 'p':
+	  	case 'c':
+	  		return 19;
+	  	default:
+	  		return 11;
+	  }
+  }
+  
+  /**
+   * Row positioning of weapons. Used when drawn.
+   * @return
+   */
+  public int weaponRow() {
+	  char init = this.initial;
+	  switch(init) {
+	  	case 'h':	
+	  	case 'm':
+	  		return 5;
+	  	case 'p':
+	  	case 'c':
+	  		return 20;
+	  	default:
+	  		return 12;
+	  }
+  }
+  
+  /**
+   * Displays the contents of the estate.
+   * @param g
+   */
+  public void drawEstateContents(Graphics g) { //TO DO: draw weapons
+	  if(contents.size() == 0) return;
+	  Set<GameCharacter> characters = new HashSet<>();
+	  Set<Weapon> weapons = new HashSet<>();
+	  
+	  for(Card card : contents) {
+		  if(card instanceof GameCharacter) {
+			  characters.add((GameCharacter) card);
+		  } else if(card instanceof Weapon){
+			  weapons.add((Weapon) card);
+		  }
+	  }
+	  
+	  if(!characters.isEmpty()) {
+		  int index = 0;
+		  for(GameCharacter c : characters) {
+			  int x = leftCol()+index;
+			  c.drawCharToken(g, x, charRow());
+			  index++;
+		  }
+	  }
+	  
+	  //Draw weapons
+  }
 }
