@@ -155,7 +155,8 @@ public class Player {
    * Returns a random number from 2 to 12 (inclusive):
    */
   private static int rollDice(){
-    return (int)(Math.random() * 11) + 2;
+    //return (int)(Math.random() * 11) + 2;
+	  return 12;
   }
 
   /**
@@ -293,7 +294,10 @@ public class Player {
       }
       System.out.println("Invalid name. Please try again:");
     }
-
+    
+    //==============================================================================================
+    Board.gui.repaint(); 
+    //==============================================================================================
     Board.wait(1000);
 
     // Output guess:
