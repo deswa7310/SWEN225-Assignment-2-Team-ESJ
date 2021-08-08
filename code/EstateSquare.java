@@ -106,9 +106,48 @@ public class EstateSquare extends Square {
 	  
 	  //g.setColor(c);
 	  g.fillRect((col*SIZE)+WALL, (row*SIZE)+WALL, SIZE, SIZE);
-//	  if(side != null || index == -1) {
+//	  if(side != null) {
 //		  drawSide(g);
 //	  } 
   }
+  
+  public void drawEstateSide(Graphics g) {
+	  if(side == null) return;
+	  g.setColor(new Color(36,36,36));
+	  int thickness = SIZE/4;
+	  switch(side) {
+	  	case TOP:
+	  		g.fillRect(((col*SIZE)+WALL) - SIZE, (row*SIZE)+WALL, SIZE*3, thickness);
+	  		return;
+	  	case BOTTOM:
+	  		g.fillRect(((col*SIZE)+WALL) - SIZE, ((row*SIZE)+WALL) + (thickness*3), SIZE*3, thickness);
+	  		return;
+	  	case RIGHT:
+	  		g.fillRect(((col*SIZE)+WALL) + (thickness*3), (row*SIZE)+WALL - SIZE, thickness, SIZE*3);
+	  		return;
+	  	default:
+	  		g.fillRect(((col*SIZE)+WALL), (row*SIZE)+WALL - SIZE, thickness, SIZE*3);
+	  }
+  }
+  
+  public void drawEntrance(Graphics g) {
+	  if(side == null || !entrance) return;
+	  g.setColor(new Color(85,60,42));
+	  int thickness = SIZE/4;
+	  switch(side) {
+	  	case TOP:
+	  		g.fillRect(((col*SIZE)+WALL), (row*SIZE)+WALL, SIZE, thickness);
+	  		return;
+	  	case BOTTOM:
+	  		g.fillRect(((col*SIZE)+WALL), ((row*SIZE)+WALL) + (thickness*3), SIZE, thickness);
+	  		return;
+	  	case RIGHT:
+	  		g.fillRect(((col*SIZE)+WALL) + (thickness*3), (row*SIZE)+WALL, thickness, SIZE);
+	  		return;
+	  	default:
+	  		g.fillRect(((col*SIZE)+WALL), (row*SIZE)+WALL, thickness, SIZE);
+	  }
+  }
+  
   
 }
