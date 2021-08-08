@@ -1,5 +1,7 @@
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 
 /**
  * GameCharacter is a subclass of Card and represents a playable character in Murder Madness.
@@ -50,7 +52,7 @@ public class GameCharacter extends Card {
 	  if(!this.inEstate()) {
 		  x = square.col;
 		  y = square.row;
-		  drawCharToken(g,x,y);
+		  drawCharToken(g,x,y,0);
 	  }
   }
   
@@ -60,33 +62,46 @@ public class GameCharacter extends Card {
    * @param x
    * @param y
    */
-  public void drawCharToken(Graphics g, int x, int y) {
-	  x = (x * Square.SIZE) + Square.WALL;
+  public void drawCharToken(Graphics g, int x, int y, int offset) {
+	  x = (x * Square.SIZE) + Square.WALL + offset;
 	  y = (y * Square.SIZE) + Square.WALL;
-	  int offset = Square.SIZE/2;
+	  offset = Square.SIZE/2;
 	  char in = this.initial;
+//	  Graphics2D g = (Graphics2D) g1;
 	  switch(in) {
   		case 'L':
   			g.setColor(new Color(42,161,70));
   			g.fillOval(x, y, Square.SIZE, Square.SIZE);
+//  			g.setColor(new Color(36,36,36));
+//  			g.setStroke(new BasicStroke(2));
+//  			g.drawOval(x, y, Square.SIZE, Square.SIZE);
   			g.setColor(Color.WHITE);
   			g.drawString("L",x+offset,y+offset);
   			break;
   		case 'B':
   			g.setColor(new Color(38,75,204));
   			g.fillOval(x, y, Square.SIZE, Square.SIZE);
+//  			g.setColor(new Color(36,36,36));
+//  			g.setStroke(new BasicStroke(3));
+//  			g.drawOval(x, y, Square.SIZE, Square.SIZE);
   			g.setColor(Color.WHITE);
   			g.drawString("B",x+offset,y+offset);
   			break;
   		case 'M':
   			g.setColor(new Color(248,208,52));
   			g.fillOval(x, y, Square.SIZE, Square.SIZE);
+//  			g.setColor(new Color(36,36,36));
+//  			g.setStroke(new BasicStroke(2));
+//  			g.drawOval(x, y, Square.SIZE, Square.SIZE);
   			g.setColor(Color.WHITE);
   			g.drawString("M",x+offset,y+offset);
   			break;
   		default:
   			g.setColor(new Color(228,0,39));
   			g.fillOval(x, y, Square.SIZE, Square.SIZE);
+//  			g.setColor(new Color(36,36,36));
+//  			g.setStroke(new BasicStroke(2));
+//  			g.drawOval(x, y, Square.SIZE, Square.SIZE);
   			g.setColor(Color.WHITE);
   			g.drawString("P",x+offset,y+offset);
   			break;
