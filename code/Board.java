@@ -1,7 +1,11 @@
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Graphics;
+import java.awt.Image;
+import java.io.IOException;
 import java.util.*;
+
+import javax.imageio.ImageIO;
 
 /**
  * Board describes a board in the famous family game Murder Madness.
@@ -38,6 +42,7 @@ public class Board {
 
   /** Scanner for user input: */
   private static final Scanner input = new Scanner(System.in);
+  
 
 
   /**
@@ -51,6 +56,10 @@ public class Board {
     dealCards();
     wait(1000);
     startGame();
+  }
+  
+  public static boolean gameOver() {
+	  return gameOver;
   }
   
   /*
@@ -85,10 +94,32 @@ public class Board {
 	  //g.setColor(black);
 	  //g.fillRect(board);
 	  
+	  //Draws Each Square
 	  for(int row = 0; row < ROWS; row++) {
 		  for(int col = 0; col < COLS; col++) {
 			  Square s = grid[row][col];
 			  s.drawSquare(g);  
+		  }
+	  }
+	  
+	  //Draws the walls of the estates. Needs to be done after previous loop to stop overlapping of squares and sides.
+	  for(int row = 0; row < ROWS; row++) {
+		  for(int col = 0; col < COLS; col++) {
+			  Square s = grid[row][col];
+			  if(s instanceof EstateSquare) {
+				  EstateSquare es = (EstateSquare) s;
+				  es.drawEstateSide(g); 
+			  }
+		  }
+	  }
+	  
+	  for(int row = 0; row < ROWS; row++) {
+		  for(int col = 0; col < COLS; col++) {
+			  Square s = grid[row][col];
+			  if(s instanceof EstateSquare) {
+				  EstateSquare es = (EstateSquare) s;
+				  es.drawEntrance(g); 
+			  }
 		  }
 	  }
 	  
@@ -374,6 +405,10 @@ public class Board {
       next.startTurn(input, players, currentPlayerIndex, allCards, solution, grid);
       endTurn();
     }
+    gui.repaint();
+    
+    
+    
   }
 
   /**
@@ -481,10 +516,10 @@ public class Board {
 
   public static void main(String... args){
 	Board.initBoard();
-	//EventQueue.invokeLater(() -> {
-	//GUI gui = new GUI();
-	//gui.setVisible(true);
-	//});
-    
   }
+  
+  
+  
+  
+  
 }
