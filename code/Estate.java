@@ -1,4 +1,6 @@
+import java.awt.Color;
 import java.awt.Graphics;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -19,6 +21,8 @@ public class Estate extends Card {
    * number of Cards from its contents that can be displayed.
    */
   private int capacity = 0;
+  
+  private final int SIDE_OFFSET = (Square.SIZE/4) + 4;
 
   /** All Estate names. */
   public enum Name {
@@ -67,7 +71,7 @@ public class Estate extends Card {
 	  	case 'm':
 	  		return 17;
 	  	default:
-	  		return 10;
+	  		return 9;
 	  }
   }
   
@@ -110,8 +114,9 @@ public class Estate extends Card {
   /**
    * Displays the contents of the estate.
    * @param g
+ * @throws IOException 
    */
-  public void drawEstateContents(Graphics g) { //TO DO: draw weapons
+  public void drawEstateContents(Graphics g) throws IOException { //TO DO: draw weapons
 	  if(contents.size() == 0) return;
 	  Set<GameCharacter> characters = new HashSet<>();
 	  Set<Weapon> weapons = new HashSet<>();
@@ -128,11 +133,30 @@ public class Estate extends Card {
 		  int index = 0;
 		  for(GameCharacter c : characters) {
 			  int x = leftCol()+index;
-			  c.drawCharToken(g, x, charRow());
+			  c.drawCharToken(g, x, charRow(),SIDE_OFFSET);
 			  index++;
 		  }
 	  }
 	  
-	  //Draw weapons
+	  if(!weapons.isEmpty()) {
+		  int index = 0;
+		  for(Weapon w : weapons) {
+			  int x = leftCol()+index;
+			  w.drawWeapon(g, x, weaponRow(),SIDE_OFFSET);
+			  index++;
+		  }
+	  }
+	  
+  }
+  
+  /**
+   * displays the name of the estate on the board.
+   * @param g
+   */
+  public void drawEstateName(Graphics g) {
+	  float fSize = 15.0f;
+	  g.setFont(g.getFont().deriveFont(fSize));
+	  g.setColor(new Color(36,36,36));
+	  g.drawString(name, (leftCol()*Square.SIZE)+Square.WALL+SIDE_OFFSET, (charRow()*Square.SIZE)-Square.SIZE+Square.WALL);
   }
 }
