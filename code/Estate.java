@@ -1,7 +1,7 @@
-import java.awt.Color;
-import java.awt.Graphics;
-import java.io.IOException;
+import java.awt.*;
 import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Estate is a subclass of Card, describing an estate in Murder Madness.
@@ -21,8 +21,8 @@ public class Estate extends Card {
    * number of Cards from its contents that can be displayed.
    */
   private int capacity = 0;
-  
-  private final int SIDE_OFFSET = (Square.SIZE/4) + 4;
+
+  public static final int SIDE_OFFSET = (Square.SIZE/4) + 4;
 
   /** All Estate names. */
   public enum Name {
@@ -55,15 +55,17 @@ public class Estate extends Card {
   public void removeContents(Card c){ contents.remove(c); }
   /** Gets the Card within the Estate's contents at the specified index: */
   public Card getContents(int index){ return (index < contents.size() ? contents.get(index) : null); }
-  
+
+  public String getDescription(){
+  	return name + " estate. Contents: " + contents.stream().map(Card::toString).collect(Collectors.joining(", "));
+  }
   
   /**
    * Column positioning of contents. Used when drawn.
    * @return
    */
   public int leftCol() {
-	  char init = this.initial;
-	  switch(init) {
+	  switch(initial) {
 	  	case 'h':	
 	  	case 'c':
 	  		return 2;
@@ -80,8 +82,7 @@ public class Estate extends Card {
    * @return
    */
   public int charRow() {
-	  char init = this.initial;
-	  switch(init) {
+	  switch(initial) {
 	  	case 'h':	
 	  	case 'm':
 	  		return 4;
@@ -98,8 +99,7 @@ public class Estate extends Card {
    * @return
    */
   public int weaponRow() {
-	  char init = this.initial;
-	  switch(init) {
+	  switch(initial) {
 	  	case 'h':	
 	  	case 'm':
 	  		return 5;
@@ -114,9 +114,8 @@ public class Estate extends Card {
   /**
    * Displays the contents of the estate.
    * @param g
- * @throws IOException 
    */
-  public void drawEstateContents(Graphics g) throws IOException { //TO DO: draw weapons
+  public void drawEstateContents(Graphics g) { //TO DO: draw weapons
 	  if(contents.size() == 0) return;
 	  Set<GameCharacter> characters = new HashSet<>();
 	  Set<Weapon> weapons = new HashSet<>();
@@ -137,7 +136,7 @@ public class Estate extends Card {
 			  index++;
 		  }
 	  }
-	  
+
 	  if(!weapons.isEmpty()) {
 		  int index = 0;
 		  for(Weapon w : weapons) {
@@ -146,17 +145,18 @@ public class Estate extends Card {
 			  index++;
 		  }
 	  }
-	  
   }
-  
-  /**
-   * displays the name of the estate on the board.
-   * @param g
-   */
-  public void drawEstateName(Graphics g) {
-	  float fSize = 15.0f;
-	  g.setFont(g.getFont().deriveFont(fSize));
-	  g.setColor(new Color(36,36,36));
-	  g.drawString(name, (leftCol()*Square.SIZE)+Square.WALL+SIDE_OFFSET, (charRow()*Square.SIZE)-Square.SIZE+Square.WALL);
-  }
+
+	/**
+	 * displays the name of the estate on the board.
+	 * @param g
+	 */
+	public void drawEstateName(Graphics g) {
+		float fSize = 15.0f;
+		g.setFont(g.getFont().deriveFont(fSize));
+		g.setColor(new Color(36,36,36));
+		int y = (charRow()*Square.SIZE)-Square.SIZE+Square.WALL;
+		if (initial == 'v') y += Square.SIZE;
+		g.drawString(name, (leftCol()*Square.SIZE)+Square.WALL+SIDE_OFFSET, y);
+	}
 }

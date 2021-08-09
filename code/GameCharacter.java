@@ -1,7 +1,4 @@
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+import java.awt.*;
 
 /**
  * GameCharacter is a subclass of Card and represents a playable character in Murder Madness.
@@ -65,47 +62,28 @@ public class GameCharacter extends Card {
   public void drawCharToken(Graphics g, int x, int y, int offset) {
 	  x = (x * Square.SIZE) + Square.WALL + offset;
 	  y = (y * Square.SIZE) + Square.WALL;
-	  offset = Square.SIZE/2;
-	  char in = this.initial;
-//	  Graphics2D g = (Graphics2D) g1;
-	  switch(in) {
+	  //Graphics2D g = (Graphics2D) g1;
+	  Color colour;
+	  switch(initial) {
   		case 'L':
-  			g.setColor(new Color(42,161,70));
-  			g.fillOval(x, y, Square.SIZE, Square.SIZE);
-//  			g.setColor(new Color(36,36,36));
-//  			g.setStroke(new BasicStroke(2));
-//  			g.drawOval(x, y, Square.SIZE, Square.SIZE);
-  			g.setColor(Color.WHITE);
-  			g.drawString("L",x+offset,y+offset);
+  			colour = new Color(42,161,70);
   			break;
   		case 'B':
-  			g.setColor(new Color(38,75,204));
-  			g.fillOval(x, y, Square.SIZE, Square.SIZE);
-//  			g.setColor(new Color(36,36,36));
-//  			g.setStroke(new BasicStroke(3));
-//  			g.drawOval(x, y, Square.SIZE, Square.SIZE);
-  			g.setColor(Color.WHITE);
-  			g.drawString("B",x+offset,y+offset);
+  			colour = new Color(38,75,204);
   			break;
   		case 'M':
-  			g.setColor(new Color(248,208,52));
-  			g.fillOval(x, y, Square.SIZE, Square.SIZE);
-//  			g.setColor(new Color(36,36,36));
-//  			g.setStroke(new BasicStroke(2));
-//  			g.drawOval(x, y, Square.SIZE, Square.SIZE);
-  			g.setColor(Color.WHITE);
-  			g.drawString("M",x+offset,y+offset);
+  			colour = new Color(248,208,52);
   			break;
   		default:
-  			g.setColor(new Color(228,0,39));
-  			g.fillOval(x, y, Square.SIZE, Square.SIZE);
-//  			g.setColor(new Color(36,36,36));
-//  			g.setStroke(new BasicStroke(2));
-//  			g.drawOval(x, y, Square.SIZE, Square.SIZE);
-  			g.setColor(Color.WHITE);
-  			g.drawString("P",x+offset,y+offset);
-  			break;
+  			colour = new Color(228,0,39);
 	  }
+	  g.setColor(colour);
+	  g.fillOval(x, y, Square.SIZE, Square.SIZE);
+	  //g.setColor(new Color(36,36,36));
+	  //g.setStroke(new BasicStroke(2));
+	  //g.drawOval(x, y, Square.SIZE, Square.SIZE);
+	  g.setColor(Color.WHITE);
+	  g.drawString(String.valueOf(initial),(int)(x+Square.SIZE*2.0/5.0),(int)(y+Square.SIZE*3.0/5.0));
   }
   
   

@@ -1,4 +1,7 @@
+import javax.swing.*;
+import java.awt.event.KeyEvent;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Player describes a player in the game Murder Madness.
@@ -12,6 +15,8 @@ public class Player {
 
   /** The Player's number (from 1 to 4). */
   public final int number;
+  /** The Player's personal nickname: */
+  public final String nickname;
   /** The Player's GameCharacter that they control. */
   public final GameCharacter character;
   /** The Player's private collection of Cards dealt to them. */
@@ -19,186 +24,153 @@ public class Player {
   /** True once the Player has made a solve attempt to signify they're eliminated. */
   private boolean solveAttempted;
 
+  private int movesLeft;
+
+  private boolean endedTurn;
+
   /** Constructs a new Player with a specified number and character to control: */
-  public Player(int number, GameCharacter c){
+  public Player(int number, String nickname, GameCharacter c){
     this.number = number;
+    this.nickname = nickname;
     this.character = c;
   }
 
   public void addToHand(Card c){ hand.add(c); }
-  /** Sets the solveAttempted flag once a Player has made a solve attempt. */
+  /** Returns true if the Player has made a solve attempt. */
   public boolean solveAttempted(){ return solveAttempted; }
 
-  /**
-   * Starts and manages a Player's turn:
-   * (Works similar to a state machine).
-   */
-  public void startTurn(Scanner input, Player[] players, int currentPlayerIndex,
-                        Map<String, Card> allCards, Set<Card> solution, Square[][] grid){
-    System.out.println("Player "+number+"'s turn ("+character+"):");
-    System.out.println("Please enter \"start\" when you are ready.");
-    Board.requireInput("start");
 
-    // Add all possible starting commands:
-    Map<String, String> commands = new HashMap<>(); // holds commands and descriptions
 
-    commands.put("check", "check the cards in your hand."); // basic ones
-    commands.put("end", "end turn.");
-    if (!solveAttempted) commands.put("solve", "attempt solving the case!");
+  public void startTurn(Game game, InputPanel input) {
+    endedTurn = false;
+    movesLeft = -1;
+    game.setChanged(nickname + "'s turn (" + character + "):");
 
-    if (character.inEstate()) { // If starting turn in an Estate:
-      Estate e = character.getEstate();
-      commands.put("leave", "leave "+e+".");
-      if (!solveAttempted) commands.put("guess", "make a guess within "+e+".");
+    addCheckButton(input);
+    if (!character.inEstate()) addRollButton(game, input);
+    else {
+      JButton guess = addGuessButton(game, input);
+      addLeaveButton(game, input, guess);
     }
-    else commands.put("roll", "roll the dice.");
+    if (!solveAttempted) addSolveButton(game, input);
+    addEndButton(input);
 
 
-    // Handle turn operations within loop:
-    int movesLeft = 0;
-    String message = "Welcome, Player " + number + "! (" + character + ")";
-
-    while (true) {
-      Board.displayBoard();
-      
-      //--------------------------------------------------------------------------------------------------------------------
-      Board.gui.repaint(); //should be in game class
-      //--------------------------------------------------------------------------------------------------------------------
-      
-      System.out.println(message);
-      System.out.println("Available actions:");
-      for (String command : commands.keySet())
-        System.out.println(" - Enter \"" + command + "\" to " + commands.get(command));
-
-      while (input.hasNext()) {
-        String command = input.nextLine().toLowerCase(); // make commands case insensitive
-
-        // If a valid command is entered:
-        if (commands.containsKey(command)){
-
-          // If it's a move:
-          if (command.length() == 1){
-            if (move(command, grid)){
-              if (character.inEstate()) { // if just entered estate during move
-                movesLeft = 0;
-                Estate e = character.getEstate();
-                message = "You ("+character+") entered "+e+".";
-                if (!solveAttempted) commands.put("guess", "make a guess within "+e+".");
-              }
-              else { // if didn't enter estate
-                movesLeft--;
-                message = "Moved " + character + ". "+ (movesLeft == 0 ? "Out of moves!" : "Moves remaining: " + movesLeft);
-              }
-              // If out of moves, remove move commands:
-              if (movesLeft == 0){
-                commands.remove("w");
-                commands.remove("a");
-                commands.remove("s");
-                commands.remove("d");
-              }
-              break;
-            }
-            // If unable to move:
-            System.out.println("Movement blocked.");
-            continue; // skip to next input
-          }
-
-          // If command is not a move:
-          switch (command){
-            case "check":
-              checkHand();
-              break;
-            case "roll":
-              commands.remove("roll");
-              movesLeft = rollDice();
-              message = "You ("+character+") rolled: "+movesLeft;
-              commands.put("w", "move up.");
-              commands.put("a", "move left.");
-              commands.put("s", "move down.");
-              commands.put("d", "move right.");
-              break;
-            case "leave":
-              if (leaveEstate(input)) {
-                commands.remove("leave");
-                commands.remove("guess");
-                commands.put("roll", "roll the dice.");
-              }
-              break;
-            case "guess":
-              guess(input, players, currentPlayerIndex, allCards);
-              return;
-            case "solve":
-              attemptSolve(input, allCards, solution);
-              return;
-            case "end":
-              return;
-          }
-          break;
-        }
-        System.out.println("Unrecognized action, please try again!");
-      }
+    while (!endedTurn) {
+      Game.wait(10);
     }
+
+    input.clearComponents();
   }
 
-
-  /**
-   * Displays the Cards in the Player's hand:
-   */
-  private void checkHand(){
-    String out = "Your cards: ";
-    for (Card c : hand) out += c+", ";
-    System.out.println(out+"\nEnter \"done\" when finished looking...");
-    Board.requireInput("done");
+  private void addCheckButton(InputPanel input){
+    JButton check = new JButton("Check Hand");
+    check.addActionListener((event) -> {
+      String handOutput = hand.stream().map(Card::toString).collect(Collectors.joining(", "));
+      JOptionPane.showMessageDialog(new JFrame(), handOutput);
+    });
+    input.addComponent(check);
   }
+
+  private void addRollButton(Game game, InputPanel input){
+    JButton roll = new JButton("Roll Dice");
+    roll.addActionListener((event) -> {
+      movesLeft = rollDice();
+      game.setChanged("You rolled: " + movesLeft + "\nMove with arrow keys.");
+      input.removeComponent(roll);
+    });
+    input.addComponent(roll);
+  }
+
+  private void addLeaveButton(Game game, InputPanel input, JButton guess){
+    JButton leave = new JButton("Leave Estate");
+    leave.addActionListener((event) -> {
+      leaveEstate(game, input, leave, guess);
+    });
+    input.addComponent(leave);
+  }
+
+  private JButton addGuessButton(Game game, InputPanel input){
+    JButton guess = new JButton("Make Guess");
+    guess.addActionListener((event) -> {
+      guess(game);
+    });
+    input.addComponent(guess);
+    return guess;
+  }
+
+  private void addSolveButton(Game game, InputPanel input){
+    JButton solve = new JButton("Attempt Solve");
+    solve.addActionListener((event) -> {
+      solve(game);
+    });
+    input.addComponent(solve);
+  }
+
+  private void addEndButton(InputPanel input){
+    JButton end = new JButton("End Turn");
+    end.addActionListener((event) -> endedTurn = true);
+    input.addComponent(end);
+  }
+
 
   /**
    * Returns a random number from 2 to 12 (inclusive):
    */
   private static int rollDice(){
-    //return (int)(Math.random() * 11) + 2;
-	  return 12;
+    return (int)(Math.random() * 11) + 2;
   }
 
-  /**
-   * Attempts to move the current Player in the specified key direction.
-   * Returns true if successful.
-   */
-  private boolean move(String directionKey, Square[][] grid){
+  public void move(KeyEvent key, Game game, InputPanel input){
+    if (movesLeft <= 0 || character.inEstate()) return;
+
     Square current = character.getSquare();
     int row = current.row;
     int col = current.col;
-    switch (directionKey){
-      case "w":
+    switch (key.getKeyCode()) {
+      case KeyEvent.VK_UP:
         row--;
         break;
-      case "a":
+      case KeyEvent.VK_LEFT:
         col--;
         break;
-      case "s":
+      case KeyEvent.VK_DOWN:
         row++;
         break;
-      case "d":
+      case KeyEvent.VK_RIGHT:
         col++;
         break;
       default:
-        throw new IllegalArgumentException("Invalid direction key: "+directionKey);
+        return;
     }
-    if (row < 0 || row >= Board.ROWS || col < 0 || col >= Board.COLS) return false;
-    Square next = grid[row][col];
-    if (next.isBlocked()) return false;
+
+    if (row < 0 || row >= Board.ROWS || col < 0 || col >= Board.COLS) return;
+    Square next = game.getBoard().getSquare(row, col);
+    if (next.isBlocked()) return;
 
     // Finally move character to next square:
     character.moveToSquare(next);
     current.removeCharacter();
     next.setCharacter(character);
-    return true;
+
+    movesLeft--;
+    if (character.inEstate()){
+      movesLeft = 0;
+      game.setChanged("You Entered:\n"+character.getEstate());
+      if (!solveAttempted) addGuessButton(game, input);
+    }
+    else {
+      game.setChanged(movesLeft > 0 ? "Moves Left: "+movesLeft : "Out of moves!");
+    }
   }
+
+
 
   /**
    * Lets the Player leave the Estate by choosing which exit to use.
    * Returns false if all exits are blocked:
    */
-  private boolean leaveEstate(Scanner input){
+  private void leaveEstate(Game game, InputPanel input, JButton leaveButton, JButton guessButton){
     assert(character.inEstate());
     Estate e = character.getEstate();
 
@@ -206,131 +178,40 @@ public class Player {
     Map<String, EstateSquare> exits = new HashMap<>();
     for (EstateSquare s : e.getEntrances()){
       if (!s.isExitBlocked()){
-        exits.put(s.getSide().toString().toLowerCase(), s);
+        String side = s.getSide().toString();
+        exits.put(side.charAt(0)+side.substring(1).toLowerCase(), s);
       }
     }
 
-    // If all exits are blocked, just return false:
+    // If all exits are blocked, just return:
     if (exits.isEmpty()){
-      System.out.println("All exits are blocked!");
-      Board.wait(2000);
-      return false;
+      game.setChanged("All exits are blocked!");
+      return;
     }
+    addRollButton(game, input);
+    input.removeComponent(leaveButton);
+    input.removeComponent(guessButton);
 
-    // Print out all possible exits:
-    System.out.println("Which exit would you like to use?");
-    String out = "Enter a side: ";
-    for (String side : exits.keySet()){
-      out += "\""+side+"\", ";
-    }
-    System.out.println(out);
+    String[] buttons = exits.keySet().toArray(new String[0]);
+    int index = JOptionPane.showOptionDialog(null, "Which exit would you like to use?", "Leaving Estate",
+            JOptionPane.YES_NO_OPTION, 0, null, buttons, buttons[buttons.length-1]);
 
     // Wait for Player to choose an exit:
-    NormalSquare outside = null;
-    while (input.hasNext()){
-      String in = input.nextLine().toLowerCase();
-      if (exits.containsKey(in)){
-        outside = exits.get(in).getOuterSquare();
-        break;
-      }
-      System.out.println("Unrecognized input. Please try again:");
-    }
+    NormalSquare outside = exits.get(buttons[index]).getOuterSquare();
 
     // Move Player outside:
-    assert(outside != null);
     e.removeContents(character);
     outside.setCharacter(character);
     character.moveToSquare(outside);
-    return true;
+    game.setChanged("You left the Estate.");
   }
 
-
-  /**
-   * Lets the Player guess the cards that might be in the solution.
-   * A guess involves 3 cards; a GameCharacter, Estate, and Weapon.
-   * Following Players must refute the guess if they can.
-   */
-  private void guess(Scanner input, Player[] players, int currentPlayerIndex, Map<String, Card> allCards){
-    assert(character.inEstate());
-    Estate e = character.getEstate();
-    System.out.println();
-
-    // Set up collections for this guess:
-    Set<Card> guess = new HashSet<>(Collections.singletonList(e));
-    Map<String, GameCharacter> characterMap = new HashMap<>();
-    Map<String, Weapon> weaponMap = new HashMap<>();
-    for (Card c : allCards.values()){
-      if (c instanceof GameCharacter) characterMap.put(c.name.toLowerCase(), (GameCharacter) c);
-      else if (c instanceof Weapon) weaponMap.put(c.name.toLowerCase(), (Weapon) c);
-    }
-
-    // Let Player pick a GameCharacter:
-    System.out.println("Enter a Character name for your guess:");
-    while (input.hasNext()){
-      String in = input.nextLine().toLowerCase();
-      if (characterMap.containsKey(in)){
-        GameCharacter c = characterMap.get(in);
-        guess.add(c);
-
-        // Move GameCharacter to Estate:
-        moveToEstate(c, c.getSquare(), e);
-        c.setSquare(null);
-        break;
-      }
-      System.out.println("Invalid name. Please try again:");
-    }
-
-    // Now pick a Weapon:
-    System.out.println("Now enter a Weapon name for your guess:");
-    while (input.hasNext()){
-      String in = input.nextLine().toLowerCase();
-      if (weaponMap.containsKey(in)){
-        Weapon w = weaponMap.get(in);
-        guess.add(w);
-
-        // Move Weapon to Estate:
-        moveToEstate(w, null, e);
-        break;
-      }
-      System.out.println("Invalid name. Please try again:");
-    }
-    
-    //==============================================================================================
-    Board.gui.repaint(); 
-    //==============================================================================================
-    Board.wait(1000);
-
-    // Output guess:
-    String out = "Your guess: ";
-    for (Card c : guess) out += c+", ";
-    System.out.println(out+"\n");
-
-    Board.wait(1000);
-
-    // Cycle through other players:
-    for (int delta = 1; delta < 4; delta++){
-      int i = (currentPlayerIndex + delta) % 4;
-      Player p = players[i];
-      // If a refute was made:
-      if(p.refute(input, guess, this)){
-        System.out.println("Please enter \"done\" when finished looking:");
-        Board.requireInput("done");
-        return;
-      }
-      Board.wait(1000);
-    }
-
-    // If cards were not found:
-    System.out.println("\nNo other players have those cards!");
-    System.out.println("Please enter \"end\" to end turn:");
-    Board.requireInput("end");
-  }
 
   /**
    * Moves a Card to the specified Estate.
    * Used when a guess is made.
    */
-  private void moveToEstate(Card c, Square s, Estate e){
+  public static void moveToEstate(Card c, Estate e){
     // If already in an Estate, only move it if it's in a different one:
     if (c.inEstate()){
       Estate current = c.getEstate();
@@ -342,7 +223,7 @@ public class Player {
     }
     // Else if not in an Estate, move it (only applies to GameCharacters):
     else {
-      s.removeCharacter();
+      ((GameCharacter) c).getSquare().removeCharacter();
       c.setEstate(e);
       e.addContents(c);
     }
@@ -352,126 +233,75 @@ public class Player {
    * Returns false if Player has no guess cards in their hand.
    * Else, they must choose one to reveal and it returns true.
    */
-  protected boolean refute(Scanner input, Set<Card> guess, Player original){
+  protected boolean refute(Set<Card> guess, Player original){
     // Add guessed Cards to options if they're in hand:
-    Map<String, Card> options = new HashMap<>();
+    List<Card> options = new ArrayList<>();
     for (Card c : guess){
-      if (hand.contains(c)) options.put(c.name.toLowerCase(), c);
+      if (hand.contains(c)) options.add(c);
     }
 
     // If none of the cards were found:
-    if (options.isEmpty()){
-      System.out.println("Player "+number+" ("+character+") has no refutation cards.");
-      return false;
-    }
+    if (options.isEmpty()) return false;
 
     // If they do have options, let them choose:
-    System.out.println("Player "+number+" ("+character+") has refutation card(s)!\n");
-    System.out.println("Player "+number+", when ready to choose, please enter \"ready\":");
-    Board.requireInput("ready");
+    String message = nickname+" ("+character+") has refutation card(s)! "+nickname+", when ready to choose, press OK.";
+    JOptionPane.showMessageDialog(null, message);
 
-    String out = "Enter the Card you wish to reveal: ";
-    for (Card c : options.values()) out += "\""+c.toString().toLowerCase()+"\", ";
-    System.out.println(out);
-    Card c = null;
-    while (input.hasNext()){
-      String in = input.nextLine().toLowerCase();
-      if (options.containsKey(in)){
-        c = options.get(in);
-        break;
-      }
-      System.out.println("Invalid name. Please try again:");
-    }
-
-    Board.wait(1000);
-    System.out.println("You have chosen "+c+".\n");
-    Board.wait(1000);
-
-    // Finally, let original Player see it:
-    Board.displayBoard();
-    System.out.println("Please hand the device back to Player "+original.number+" ("+original.character+").");
-    Board.wait(2000);
-    System.out.println("Player "+number+" revealed: "+c);
+    new RefuteOptionPane(options, this, original);
     return true;
   }
 
+  private void guess(Game game){
+    new GuessOptionPane(game, this, character.getEstate());
+  }
 
   /**
-   * Player attempts to solve the murder. Prompts player to enter 3 card names.
+   * Player attempts to solve the murder. Prompts player to pick 3 card names.
    * If guess is correct, Player wins!
    * Else Player is eliminated and can no longer guess or make solve attempts.
    */
-  private void attemptSolve(Scanner input, Map<String, Card> allCards, Set<Card> solution){
+  private void solve(Game game){
     solveAttempted = true;
-    System.out.println("Please enter the 3 card names, separated by commas:");
-    while (input.hasNext()){
-      String in = input.nextLine();
-      String[] names = in.split(",");
+    new GuessOptionPane(game, this, null);
+  }
 
-      // If wrong number of names entered:
-      if (names.length != 3){
-        System.out.println("Invalid number of names entered ("+names.length+"). Please try again:");
-        continue;
-      }
-
-      // Check if names are valid card names:
-      Set<String> invalidNames = new HashSet<>();
-      for (int i = 0; i < names.length; i++){
-        String name = names[i].trim();
-        names[i] = name.toLowerCase();
-        if (!allCards.containsKey(names[i])) invalidNames.add(name);
-      }
-
-      // If there are invalid names:
-      if (!invalidNames.isEmpty()){
-        String out = "Invalid card names: ";
-        for (String name : invalidNames) out += name+", ";
-        System.out.println(out+"\nPlease try again:");
-        continue;
-      }
-
-      // Check for duplicates:
-      Set<String> uniqueNames = new HashSet<>(Arrays.asList(names));
-      if (uniqueNames.size() != 3){
-        System.out.println("Duplicate names entered. Please try again:");
-        continue;
-      }
-
-      // Check if prediction matches solution:
-      String predictionOut = "\nYou entered: ";
-      boolean failed = false;
-      for (String name : names){
-        Card c = allCards.get(name.toLowerCase());
-        predictionOut += c.toString() + ", ";
-        if (!solution.contains(c)) failed = true;
-      }
-      System.out.println(predictionOut);
-
-      String solutionOut = "The solution: ";
-      for (Card c : solution) solutionOut += c.toString() + ", ";
-      System.out.println(solutionOut+"\n");
-
-      Board.wait(2000);
-
-      // Determine output based on whether they solved it or failed:
-      if (failed){
-        System.out.println("Your prediction was wrong. You have been eliminated.");
-        Board.wait(2000);
-        if (Board.allPlayersEliminated()) Board.endGame(false);
-        else {
-          System.out.println("Please enter \"end\" to end turn:");
-          Board.requireInput("end");
+  public void confirmGuess(Game game, Set<Card> guess, boolean guessing){
+    if (guessing){
+      boolean refuted = false;
+      for (int delta = 1; delta < 4; delta++){
+        int i = (game.getCurrentPlayerIndex() + delta) % 4;
+        Player p = game.getPlayers()[i];
+        // If a refute was made:
+        if(p.refute(guess, this)){
+          refuted = true;
+          break;
         }
       }
-      else {
-        System.out.println("Your prediction was right! You win.");
-        Board.wait(2000);
-        Board.endGame(true);
-      }
-      return;
+      // If the cards were not found:
+      if (!refuted) JOptionPane.showMessageDialog(null, "No other Players have those cards!");
     }
-    throw new IllegalAccessError();
+    else { // making solve attempt:
+      Set<Card> solution = game.getSolution();
+      boolean won = true;
+      for (Card c : guess){
+        if (!solution.contains(c)){
+          won = false;
+          break;
+        }
+      }
+      if (won){
+        JOptionPane.showMessageDialog(new JFrame(), "Congratulations, you win!");
+        game.endGame(true);
+      }
+      else {
+        String solutionOutput = solution.stream().map(Card::toString).collect(Collectors.joining(", "));
+        JOptionPane.showMessageDialog(new JFrame(), "You are eliminated. The solution was: "+solutionOutput);
+        if (game.allPlayersEliminated()) game.endGame(false);
+      }
+    }
+    endedTurn = true;
   }
+
 
 
   @Override
