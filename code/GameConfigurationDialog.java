@@ -1,8 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +19,12 @@ public class GameConfigurationDialog extends JDialog {
         setTitle("Game Configuration");
         setAlwaysOnTop(true);
 
+        addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                game.setChanged("close");
+            }
+        });
+
         JPanel titlePanel = createTitlePanel();
         JPanel optionsPanel = createOptionsPanel();
         JPanel confirmPanel = createConfirmPanel(optionsPanel);
@@ -35,12 +39,12 @@ public class GameConfigurationDialog extends JDialog {
         add(confirmPanel, c);
         pack();
 
-        // Center window in screen
+        // Center window:
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Dimension screensize = toolkit.getScreenSize();
-        setBounds((screensize.width - getWidth()) / 2, (screensize.height - getHeight()) / 2, getWidth(), getHeight());
+        setBounds((screensize.width - getWidth())/2, (screensize.height - getHeight())/2, getWidth(), getHeight());
 
-        // Display window!
+        // Display window:
         setVisible(true);
     }
 

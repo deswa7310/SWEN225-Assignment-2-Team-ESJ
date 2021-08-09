@@ -26,17 +26,16 @@ public class GUI extends JFrame implements KeyListener, Observer {
 		this.game = game;
 		this.inputPanel = input;
 		initUI();
+		initCloseDialog();
 	}
 
 	private void initUI() {
 		setSize((int) (SIZE * 1.5), SIZE + 100);
 		setFocusable(true);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle("Murder Madness");
 		setLocationRelativeTo(null);
 		setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
-
 
 		DrawPanel drawPanel = new DrawPanel(game);
 		textPanel = new TextPanel();
@@ -74,6 +73,24 @@ public class GUI extends JFrame implements KeyListener, Observer {
 		setVisible(true);
 	}
 
+	private void initCloseDialog(){
+		addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				int index = JOptionPane.showConfirmDialog(null,
+						"Are you sure you want to exit?", "Exit Confirmation",
+						JOptionPane.YES_NO_OPTION);
+				switch (index){
+					case JOptionPane.YES_OPTION:
+						setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+						break;
+					case JOptionPane.NO_OPTION:
+						setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+						break;
+				}
+			}
+		});
+	}
+
 	/*
 	 * Sets up menu bar.
 	 */
@@ -105,7 +122,9 @@ public class GUI extends JFrame implements KeyListener, Observer {
 	public void update(Observable o, Object arg) {
 		repaint();
 		if (arg instanceof String) {
-			textPanel.setText((String) arg);
+			String text = (String) arg;
+			if (text.equals("close")) System.exit(-1);
+			textPanel.setText(text);
 		}
 	}
 
