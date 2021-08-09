@@ -1,6 +1,3 @@
-import jdk.internal.util.xml.impl.Input;
-
-import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.util.*;
 
@@ -37,7 +34,7 @@ public class Game extends Observable {
 
 
     private Game(){
-        input = new InputPanel(this);
+        input = new InputPanel();
         addObserver(new GUI(this, input));
         newGame();
     }

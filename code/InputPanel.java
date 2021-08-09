@@ -4,13 +4,10 @@ import java.awt.*;
 
 public class InputPanel extends JPanel {
 
-    private final Game game;
-
     private final JPanel inputContainer;
 
 
-    public InputPanel(Game game){
-        this.game = game;
+    public InputPanel(){
         setFocusable(true);
         setMaximumSize(getSize());
         setPreferredSize(getSize());
