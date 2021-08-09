@@ -24,6 +24,12 @@ public class NormalSquare extends Square {
   public String toString(){
     return character == null ? " " : character.toString().substring(0, 1);
   }
+
+  @Override
+  public String getDescription(){
+    if (character != null) return character.name+" on a normal square.";
+    return "A normal square. Can be walked on.";
+  }
   
   @Override
   public void drawSquare(Graphics g) {

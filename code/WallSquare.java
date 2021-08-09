@@ -14,6 +14,11 @@ public class WallSquare extends Square {
 
   @Override
   public String toString(){ return "X"; }
+
+  @Override
+  public String getDescription(){
+      return "A wall square. Blocks movement.";
+  }
   
   @Override
   public void drawSquare(Graphics g) {

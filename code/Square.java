@@ -29,6 +29,8 @@ public abstract class Square {
      */
     public abstract void drawSquare(Graphics g);
 
+    public abstract String getDescription();
+
     /** Should not be accessible: */
     public void setCharacter(GameCharacter c){ throw new IllegalAccessError(); }
     /** Should not be accessible: */

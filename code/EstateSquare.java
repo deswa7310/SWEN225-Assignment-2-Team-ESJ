@@ -77,9 +77,14 @@ public class EstateSquare extends Square {
     if (c == null) return " ";
     return String.valueOf(c.initial);
   }
+
+    @Override
+    public String getDescription(){
+        return estate.getDescription();
+    }
   
   @Override
-  public void drawSquare(Graphics g) { //TO DO: draw enterance and walls
+  public void drawSquare(Graphics g) { //TO DO: draw entrance and walls
 	  char in = estate.initial;
 	  //Color c = null;
 	  switch (in) {
@@ -110,44 +115,44 @@ public class EstateSquare extends Square {
 //		  drawSide(g);
 //	  } 
   }
-  
-  public void drawEstateSide(Graphics g) {
-	  if(side == null) return;
-	  g.setColor(new Color(36,36,36));
-	  int thickness = SIZE/4;
-	  switch(side) {
-	  	case TOP:
-	  		g.fillRect(((col*SIZE)+WALL) - SIZE, (row*SIZE)+WALL, SIZE*3, thickness);
-	  		return;
-	  	case BOTTOM:
-	  		g.fillRect(((col*SIZE)+WALL) - SIZE, ((row*SIZE)+WALL) + (thickness*3), SIZE*3, thickness);
-	  		return;
-	  	case RIGHT:
-	  		g.fillRect(((col*SIZE)+WALL) + (thickness*3), (row*SIZE)+WALL - SIZE, thickness, SIZE*3);
-	  		return;
-	  	default:
-	  		g.fillRect(((col*SIZE)+WALL), (row*SIZE)+WALL - SIZE, thickness, SIZE*3);
-	  }
-  }
-  
-  public void drawEntrance(Graphics g) {
-	  if(side == null || !entrance) return;
-	  g.setColor(new Color(85,60,42));
-	  int thickness = SIZE/4;
-	  switch(side) {
-	  	case TOP:
-	  		g.fillRect(((col*SIZE)+WALL), (row*SIZE)+WALL, SIZE, thickness);
-	  		return;
-	  	case BOTTOM:
-	  		g.fillRect(((col*SIZE)+WALL), ((row*SIZE)+WALL) + (thickness*3), SIZE, thickness);
-	  		return;
-	  	case RIGHT:
-	  		g.fillRect(((col*SIZE)+WALL) + (thickness*3), (row*SIZE)+WALL, thickness, SIZE);
-	  		return;
-	  	default:
-	  		g.fillRect(((col*SIZE)+WALL), (row*SIZE)+WALL, thickness, SIZE);
-	  }
-  }
-  
-  
+
+    public void drawEstateSide(Graphics g) {
+        if(side == null) return;
+        g.setColor(new Color(36,36,36));
+        int thickness = SIZE/4;
+        switch(side) {
+            case TOP:
+                g.fillRect(((col*SIZE)+WALL) - SIZE, (row*SIZE)+WALL, SIZE*3, thickness);
+                return;
+            case BOTTOM:
+                g.fillRect(((col*SIZE)+WALL) - SIZE, ((row*SIZE)+WALL) + (thickness*3), SIZE*3, thickness);
+                return;
+            case RIGHT:
+                g.fillRect(((col*SIZE)+WALL) + (thickness*3), (row*SIZE)+WALL - SIZE, thickness, SIZE*3);
+                return;
+            default:
+                g.fillRect(((col*SIZE)+WALL), (row*SIZE)+WALL - SIZE, thickness, SIZE*3);
+        }
+    }
+
+    public void drawEntrance(Graphics g) {
+        if(side == null || !entrance) return;
+        g.setColor(new Color(85,60,42));
+        int thickness = SIZE/4;
+        switch(side) {
+            case TOP:
+                g.fillRect(((col*SIZE)+WALL), (row*SIZE)+WALL, SIZE, thickness);
+                return;
+            case BOTTOM:
+                g.fillRect(((col*SIZE)+WALL), ((row*SIZE)+WALL) + (thickness*3), SIZE, thickness);
+                return;
+            case RIGHT:
+                g.fillRect(((col*SIZE)+WALL) + (thickness*3), (row*SIZE)+WALL, thickness, SIZE);
+                return;
+            default:
+                g.fillRect(((col*SIZE)+WALL), (row*SIZE)+WALL, thickness, SIZE);
+        }
+    }
+
+
 }
