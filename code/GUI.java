@@ -81,11 +81,20 @@ public class GUI extends JFrame implements KeyListener, Observer {
 		JMenuBar menuBar = new JMenuBar();
 		JMenu menu = new JMenu("Menu");
 
+		// About menu item:
+		JMenuItem aboutMenuItem = new JMenuItem("About");
+		aboutMenuItem.setToolTipText("Shows game description");
+		aboutMenuItem.addActionListener((event) -> {
+			String desc = "Murder Madness is a fun family game where players race to solve a murder in a battle of wits!";
+			JOptionPane.showMessageDialog(null, desc);
+		});
+
 		// Exit Game menu item:
 		JMenuItem exitMenuItem = new JMenuItem("Exit Game");
 		exitMenuItem.setToolTipText("Closes game");
 		exitMenuItem.addActionListener((event) -> System.exit(0));
 
+		menu.add(aboutMenuItem);
 		menu.add(exitMenuItem);
 		menuBar.add(menu);
 
