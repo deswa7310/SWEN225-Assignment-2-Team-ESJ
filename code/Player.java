@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
  * Whether the Player has made a solve attempt is also stored to know if they're eliminated from the game.
  *
  * Player is the parent class of Computer.
+ *
+ * @author johnh
  */
 public class Player {
 
@@ -23,29 +25,60 @@ public class Player {
   protected final Set<Card> hand = new HashSet<>();
   /** True once the Player has made a solve attempt to signify they're eliminated. */
   private boolean solveAttempted;
-
+  /** The number of moves the Player has left. */
   private int movesLeft;
-
+  /** True once the Player has made a guess or solve attempt, or chosen to end their turn. */
   private boolean endedTurn;
 
-  /** Constructs a new Player with a specified number and character to control: */
+  /**
+   * Constructs a new Player with specified number, nickname, and GameCharacter to control.
+   *
+   * @param number player number
+   * @param nickname player's nickname they are referred to as
+   * @param c character to be controlled
+   */
   public Player(int number, String nickname, GameCharacter c){
     this.number = number;
     this.nickname = nickname;
     this.character = c;
   }
 
+  /**
+   * Adds a Card to the Player's hand.
+   * @param c Card to add
+   */
   public void addToHand(Card c){ hand.add(c); }
-  /** Returns true if the Player has made a solve attempt. */
+  
+  /**
+   * Returns the Player's hand of Cards.
+   * @return unmodifiable Set of Cards in Player's hand
+   */
+  public Set<Card> getHand(){ return Collections.unmodifiableSet(hand); }
+
+  /**
+   * Eliminates the Player.
+   */
+  public void setSolveAttempted() { solveAttempted = true; }
+  
+  /**
+   * Returns true if the Player has made a solve attempt.
+   * @return if solve attempted
+   */
   public boolean solveAttempted(){ return solveAttempted; }
 
-
-
+  /**
+   * Starts the Player's turn by presenting them with their available actions.
+   * Adds a JButton for each available action to the input panel.
+   *
+   * @param game the current Game
+   * @param input the InputPanel
+   */
   public void startTurn(Game game, InputPanel input) {
     endedTurn = false;
     movesLeft = -1;
     game.setChanged(nickname + "'s turn (" + character + "):");
 
+    // Add a JButton to the InputPanel for each available action:
     addCheckButton(input);
     if (!character.inEstate()) addRollButton(game, input);
     else {
@@ -55,14 +88,19 @@ public class Player {
     if (!solveAttempted) addSolveButton(game, input);
     addEndButton(input);
 
-
+    // Wait until the Player has ended their turn:
     while (!endedTurn) {
       Game.wait(10);
     }
 
+    // Reset available actions for the next Player's turn.
     input.clearComponents();
   }
 
+  /**
+   * Adds a JButton that displays the Player's hand when pressed.
+   * @param input the InputPanel
+   */
   private void addCheckButton(InputPanel input){
     JButton check = new JButton("Check Hand");
     check.addActionListener((event) -> {
@@ -72,16 +110,27 @@ public class Player {
     input.addComponent(check);
   }
 
+  /**
+   * Adds a JButton that rolls the dice and sets the Player's movesLeft when pressed.
+   * @param game the current Game
+   * @param input the InputPanel
+   */
   private void addRollButton(Game game, InputPanel input){
     JButton roll = new JButton("Roll Dice");
     roll.addActionListener((event) -> {
-      movesLeft = rollDice();
+      rollDice();
       game.setChanged("You rolled: " + movesLeft + "\nMove with arrow keys.");
       input.removeComponent(roll);
     });
     input.addComponent(roll);
   }
 
+  /**
+   * Adds a JButton that lets the Player leave the Estate if they're in one.
+   * @param game the current Game
+   * @param input the InputPanel
+   * @param guess the JButton used to make a guess
+   */
   private void addLeaveButton(Game game, InputPanel input, JButton guess){
     JButton leave = new JButton("Leave Estate");
     leave.addActionListener((event) -> {
@@ -90,6 +139,12 @@ public class Player {
     input.addComponent(leave);
   }
 
+  /**
+   * Adds a JButton that lets the Player make a guess.
+   * @param game the current Game
+   * @param input the InputPanel
+   * @return the guess JButton
+   */
   private JButton addGuessButton(Game game, InputPanel input){
     JButton guess = new JButton("Make Guess");
     guess.addActionListener((event) -> {
@@ -99,6 +154,11 @@ public class Player {
     return guess;
   }
 
+  /**
+   * Adds a JButton that lets the Player make a solve attempt.
+   * @param game the current Game
+   * @param input the InputPanel
+   */
   private void addSolveButton(Game game, InputPanel input){
     JButton solve = new JButton("Attempt Solve");
     solve.addActionListener((event) -> {
@@ -107,6 +167,10 @@ public class Player {
     input.addComponent(solve);
   }
 
+  /**
+   * Adds a JButton that lets the Player end turn without making a guess or solve attempt.
+   * @param input the InputPanel
+   */
   private void addEndButton(InputPanel input){
     JButton end = new JButton("End Turn");
     end.addActionListener((event) -> endedTurn = true);
@@ -115,18 +179,26 @@ public class Player {
 
 
   /**
-   * Returns a random number from 2 to 12 (inclusive):
+   * Sets movesLeft to a random number from 2 to 12 (inclusive):
    */
-  private static int rollDice(){
-    return (int)(Math.random() * 11) + 2;
+  public void rollDice(){
+    movesLeft = (int)(Math.random() * 11) + 2;
   }
 
+
+  /**
+   * Moves the Player by one Square in the direction specified by the key.
+   * @param key the KeyEvent of the key pressed
+   * @param game the current Game
+   * @param input the InputPanel
+   */
   public void move(KeyEvent key, Game game, InputPanel input){
     if (movesLeft <= 0 || character.inEstate()) return;
 
     Square current = character.getSquare();
     int row = current.row;
     int col = current.col;
+    // Get the next Square position using the direction of the movement:
     switch (key.getKeyCode()) {
       case KeyEvent.VK_UP:
         row--;
@@ -154,6 +226,7 @@ public class Player {
     next.setCharacter(character);
 
     movesLeft--;
+    // If they entered an Estate, they can make a guess (if not eliminated):
     if (character.inEstate()){
       movesLeft = 0;
       game.setChanged("You Entered:\n"+character.getEstate());
@@ -165,10 +238,13 @@ public class Player {
   }
 
 
-
   /**
-   * Lets the Player leave the Estate by choosing which exit to use.
-   * Returns false if all exits are blocked:
+   * Lets the Player leave the Estate they're in by choosing an exit to use.
+   *
+   * @param game the current Game
+   * @param input the InputPanel
+   * @param leaveButton the leave action button, removed from InputPanel if leave successful
+   * @param guessButton the guess action button, removed from InputPanel if leave successful
    */
   private void leaveEstate(Game game, InputPanel input, JButton leaveButton, JButton guessButton){
     assert(character.inEstate());
@@ -188,15 +264,18 @@ public class Player {
       game.setChanged("All exits are blocked!");
       return;
     }
+
+    // If leaving is possible, update available actions:
     addRollButton(game, input);
     input.removeComponent(leaveButton);
     input.removeComponent(guessButton);
 
+    // Wait for Player to choose an exit:
     String[] buttons = exits.keySet().toArray(new String[0]);
     int index = JOptionPane.showOptionDialog(null, "Which exit would you like to use?", "Leaving Estate",
             JOptionPane.YES_NO_OPTION, 0, null, buttons, buttons[buttons.length-1]);
 
-    // Wait for Player to choose an exit:
+    // Get square outside exit:
     NormalSquare outside = exits.get(buttons[index]).getOuterSquare();
 
     // Move Player outside:
@@ -210,6 +289,9 @@ public class Player {
   /**
    * Moves a Card to the specified Estate.
    * Used when a guess is made.
+   *
+   * @param c Card to be moved.
+   * @param e Estate the Card is being moved into.
    */
   public static void moveToEstate(Card c, Estate e){
     // If already in an Estate, only move it if it's in a different one:
@@ -232,6 +314,10 @@ public class Player {
   /**
    * Returns false if Player has no guess cards in their hand.
    * Else, they must choose one to reveal and it returns true.
+   *
+   * @param guess the Set of Cards in the guess
+   * @param original the Player that made the guess
+   * @return true if refute can be made
    */
   protected boolean refute(Set<Card> guess, Player original){
     // Add guessed Cards to options if they're in hand:
@@ -251,20 +337,37 @@ public class Player {
     return true;
   }
 
+  /**
+   * Lets the Player make a guess by popping up a new GuessOptionPane.
+   *
+   * @param game the current Game
+   */
   private void guess(Game game){
     new GuessOptionPane(game, this, character.getEstate());
   }
 
   /**
-   * Player attempts to solve the murder. Prompts player to pick 3 card names.
+   * Player attempts to solve the murder. Pops up a new GuessOptionPane.
    * If guess is correct, Player wins!
    * Else Player is eliminated and can no longer guess or make solve attempts.
+   *
+   * @param game the current Game
    */
   private void solve(Game game){
     solveAttempted = true;
     new GuessOptionPane(game, this, null);
   }
 
+  /**
+   * Called when a the Cards involved in a guess or solve attempt have been confirmed.
+   * If it was a guess, lets Players refute.
+   * If it was a solve attempt, eliminates Player if wrong and ends game if right or all eliminated.
+   * Ends turn either way.
+   *
+   * @param game the current Game
+   * @param guess the Set of Cards selected for the guess
+   * @param guessing true if a guess, false if a solve attempt
+   */
   public void confirmGuess(Game game, Set<Card> guess, boolean guessing){
     if (guessing){
       boolean refuted = false;
@@ -301,7 +404,6 @@ public class Player {
     }
     endedTurn = true;
   }
-
 
 
   @Override

@@ -4,13 +4,20 @@ import java.io.IOException;
 
 /**
  * Weapon is a subclass of Card representing a weapon card.
+ *
+ * @author johnh
  */
 public class Weapon extends Card {
 
+  /** Broom image representation. */
   private static final Image broom = loadImage("images/broom.png");
+  /** Ipad image representation. */
   private static final Image ipad = loadImage("images/ipad.png");
+  /** Knife image representation. */
   private static final Image knife = loadImage("images/knife.png");
+  /** Scissors image representation. */
   private static final Image scissors = loadImage("images/scissors.png");
+  /** Shovel image representation. */
   private static final Image shovel = loadImage("images/shovel.png");
 
   /** Al Weapon names: */
@@ -18,12 +25,22 @@ public class Weapon extends Card {
     Broom, Scissors, Knife, Shovel, iPad
   }
 
-  /** Constructs a Weapon card with a specified name and initial (just its index in the Name enum): */
+  /**
+   * Constructs a new Weapon with the given name:
+   * @param name name of Weapon
+   */
   public Weapon(String name){
     // Second argument converts name to enum, gets its numerical value and makes it a char:
     super(name, String.valueOf(Name.valueOf(name).ordinal()).charAt(0));
   }
 
+  /**
+   * Draws the Weapon on the board display using a custom Image.
+   * @param g the Graphics object
+   * @param x x position
+   * @param y y position
+   * @param offset position offset
+   */
   public void drawWeapon(Graphics g, int x, int y, int offset){
     x = (x * Square.SIZE) + Square.WALL + offset;
     y = (y * Square.SIZE) + Square.WALL;
@@ -50,20 +67,18 @@ public class Weapon extends Card {
   }
 
   /**
-   * Util method to load image. Taken from SWEN221 assignment "robot war".
-   * @param filename
-   * @return
+   * Utility method to load weapon images.
+   * @param filename name of image file
+   * @return the Image object of the weapon image file.
    */
   private static Image loadImage(String filename) {
-    // Using the URL means the image loads when stored
-    // in a jar or expanded into individual files.
     java.net.URL imageURL = Weapon.class.getResource(filename);
+    // Attempt loading image:
     try {
       return ImageIO.read(imageURL);
     } catch (IOException e) {
-      // We've encountered an error loading the image. There's not much we
-      // can actually do at this point, except to abort the game.
-      throw new RuntimeException("Unable to load image: " + filename);
+      // Throw exception if failed:
+      throw new RuntimeException("Could not load image: " + filename);
     }
   }
 }

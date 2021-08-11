@@ -4,9 +4,16 @@ import java.awt.Graphics;
 /**
  * WallSquare is a subclass of Square, representing a Square that GameCharacters
  * can't be placed on.
+ *
+ * @author johnh
  */
 public class WallSquare extends Square {
 
+  /**
+   * Constructs a new WallSquare with specified position.
+   * @param row row on board
+   * @param col column on board
+   */
   public WallSquare(int row, int col){ super(row, col); }
 
   @Override

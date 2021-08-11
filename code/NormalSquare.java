@@ -4,12 +4,19 @@ import java.awt.Graphics;
 /**
  * NormalSquare is a subclass of Square representing the majority of squares on the board.
  * GameCharacters can be placed on them.
+ *
+ * @author johnh
  */
 public class NormalSquare extends Square {
 
   /** The GameCharacter currently on this square. */
   private GameCharacter character;
 
+  /**
+   * Constructs a new NormalSquare with specified position.
+   * @param row row on board
+   * @param col col on board
+   */
   public NormalSquare(int row, int col){ super(row, col); }
 
   @Override

@@ -5,6 +5,8 @@ import java.awt.Graphics;
  * EstateSquare is a subclass of Square, representing a square within an Estate.
  * They have different properties based on which part of the Estate they are:
  * (inside, outside, corner, entrance).
+ *
+ * @author johnh
  */
 public class EstateSquare extends Square {
 
@@ -26,22 +28,61 @@ public class EstateSquare extends Square {
   private NormalSquare outerSquare;
   
 
-
-  /**
-   * Constructs a new EstateSquare with the specified position, Estate to be a part of,
-   * and whether it is an entrance to the Estate.
-   */
+    /**
+     * Constructs a new EstateSquare with the specified position, Estate to be a part of,
+     * and whether it is an entrance to the Estate.
+     *
+     * @param row row on board
+     * @param col column on board
+     * @param e Estate it is part of
+     * @param entrance true if it is an entrance to its Estate
+     */
   public EstateSquare(int row, int col, Estate e, boolean entrance){
     super(row, col);
     this.estate = e;
     this.entrance = entrance;
   }
 
+    /**
+     * Sets the index of this square in the Estate's contents.
+     * Only used for inner squares, when displaying contents on board.
+     * @param i index
+     */
   public void setIndex(int i){ this.index = i; }
+
+    /**
+     * Sets the side of the Estate this square is on.
+     * Only applies to outer squares.
+     * @param s side of Estate
+     */
   public void setSide(Estate.Side s){ this.side = s; }
+
+    /**
+     * Returns the side of the Estate this square is on.
+     * Only applies to outer squares.
+     * @return side of Estate
+     */
   public Estate.Side getSide(){ return side; }
+
+    /**
+     * Sets a NormalSquare as the square directly outside this square.
+     * Only applies if this square is an entrance.
+     * @param s square directly outside this entrance
+     */
   public void setOuterSquare(NormalSquare s){ this.outerSquare = s; }
+
+    /**
+     * Gets the square directly outside this square.
+     * Only applies if this square is an entrance.
+     * @return square directly outside this entrance.
+     */
   public NormalSquare getOuterSquare(){ return outerSquare; }
+
+    /**
+     * Returns true if this entrance/exit is blocked by a character.
+     * Only applies to entrances.
+     * @return true if blocked by character.
+     */
   public boolean isExitBlocked(){
     assert(entrance);
     return outerSquare.isBlocked();
@@ -108,14 +149,14 @@ public class EstateSquare extends Square {
 	  		g.setColor(new Color(123,91,83));
 	  		//c = new Color(123,91,83);
 	  }
-	  
-	  //g.setColor(c);
 	  g.fillRect((col*SIZE)+WALL, (row*SIZE)+WALL, SIZE, SIZE);
-//	  if(side != null) {
-//		  drawSide(g);
-//	  } 
   }
 
+    /**
+     * Draws a dark rectangle on the board showing the wall of the Estate.
+     * Is drawn on top of this EstateSquare.
+     * @param g the Graphics object.
+     */
     public void drawEstateSide(Graphics g) {
         if(side == null) return;
         g.setColor(new Color(36,36,36));
@@ -135,6 +176,11 @@ public class EstateSquare extends Square {
         }
     }
 
+    /**
+     * Draws a brown rectangle on the board showing this is an entrance to the Estate.
+     * It is drawn on top of this square.
+     * @param g the Graphics object
+     */
     public void drawEntrance(Graphics g) {
         if(side == null || !entrance) return;
         g.setColor(new Color(85,60,42));

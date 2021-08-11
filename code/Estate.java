@@ -6,9 +6,11 @@ import java.util.stream.Collectors;
 /**
  * Estate is a subclass of Card, describing an estate in Murder Madness.
  * It can contain other Cards (contents) and be moved in and out of by GameCharacters via entrances.
- * Every Estate is represented by a group of EstateSquares, shown in the text display.
+ * Every Estate is represented by a group of EstateSquares.
  *
  * The Estate's contents changes as Cards move in and out of it, and is displayed via the inner EstateSquares.
+ *
+ * @author johnh
  */
 public class Estate extends Card {
 
@@ -22,47 +24,80 @@ public class Estate extends Card {
    */
   private int capacity = 0;
 
+  /** The offset for the left/top of the board display. */
   public static final int SIDE_OFFSET = (Square.SIZE/4) + 4;
 
   /** All Estate names. */
   public enum Name {
-    Haunted_House, Manic_Manor, Villa_Celia, Calamity_Castle, Peril_Palace
+	Haunted_House, Manic_Manor, Villa_Celia, Calamity_Castle, Peril_Palace
   }
 
   /** All sides of an Estate. */
   public enum Side {
-    LEFT, TOP, RIGHT, BOTTOM
+	LEFT, TOP, RIGHT, BOTTOM
   }
 
-  /**
-   * Constructs a new Estate with specified name and initial (first letter, lower case).
-   */
-  public Estate(String name){
-    super(name, Character.toLowerCase(name.charAt(0)));
-  }
+	/**
+	 * Creates a new Estate with the specified name.
+	 *
+	 * @param name estate's name
+	 */
+	public Estate(String name){
+	super(name, Character.toLowerCase(name.charAt(0)));
+	}
 
-  /** Adds an inner tile to the Estate that can hold a card: */
-  public void addInnerTile(EstateSquare s){
-    s.setIndex(capacity);
-    capacity++;
-  }
+	/**
+	 * Adds an inner square to the Estate that can hold a card.
+	 *
+	 * @param s inner square that can hold contents
+	 */
+  	public void addInnerTile(EstateSquare s){
+		s.setIndex(capacity);
+		capacity++;
+	  }
 
-  /** Adds an entrance to the Estate that Players can enter or leave via: */
-  public void addEntrance(EstateSquare s){ entrances.add(s); }
-  public Set<EstateSquare> getEntrances(){ return Collections.unmodifiableSet(entrances); }
+	/**
+	 * Adds an entrance to the Estate that characters can enter/exit.
+	 * @param s entrance square
+	 */
+  	public void addEntrance(EstateSquare s){ entrances.add(s); }
 
-  public void addContents(Card c){ contents.add(c); }
+	/**
+	 * Returns a set of all entrance squares.
+	 * @return an unmodifiable set of entrance squares for this Estate.
+	 */
+	public Set<EstateSquare> getEntrances(){ return Collections.unmodifiableSet(entrances); }
+
+	/**
+	 * Adds a Card to the contents of this estate.
+	 * @param c Card to add
+	 */
+	public void addContents(Card c){ contents.add(c); }
+
+	/**
+	 * Removes a Card from the contents of this estate.
+	 * @param c Card to remove
+	 */
   public void removeContents(Card c){ contents.remove(c); }
-  /** Gets the Card within the Estate's contents at the specified index: */
-  public Card getContents(int index){ return (index < contents.size() ? contents.get(index) : null); }
 
+	/**
+	 * Gets the Card at the specified index within this estate's contents.
+	 * @param index index of Card
+	 * @return Card at index in contents, else null
+	 */
+	public Card getContents(int index){ return (index < contents.size() ? contents.get(index) : null); }
+
+	/**
+	 * Returns a description of this estate.
+	 * @return description.
+	 */
   public String getDescription(){
   	return name + " estate. Contents: " + contents.stream().map(Card::toString).collect(Collectors.joining(", "));
   }
   
   /**
-   * Column positioning of contents. Used when drawn.
-   * @return
+   * Gets column positioning of contents. Used when drawn.
+   * @return column on board grid
    */
   public int leftCol() {
 	  switch(initial) {
@@ -78,8 +113,8 @@ public class Estate extends Card {
   }
   
   /**
-   * Row positioning of characters. used when drawn.
-   * @return
+   * Gets row positioning of characters. Used when drawn.
+   * @return row on board grid
    */
   public int charRow() {
 	  switch(initial) {
@@ -95,8 +130,8 @@ public class Estate extends Card {
   }
   
   /**
-   * Row positioning of weapons. Used when drawn.
-   * @return
+   * Gets row positioning of weapons. Used when drawn.
+   * @return row on board grid
    */
   public int weaponRow() {
 	  switch(initial) {
@@ -113,13 +148,14 @@ public class Estate extends Card {
   
   /**
    * Displays the contents of the estate.
-   * @param g
+   * @param g the Graphics object.
    */
-  public void drawEstateContents(Graphics g) { //TO DO: draw weapons
+  public void drawEstateContents(Graphics g) {
 	  if(contents.size() == 0) return;
 	  Set<GameCharacter> characters = new HashSet<>();
 	  Set<Weapon> weapons = new HashSet<>();
-	  
+
+	  // Separate characters and weapons in contents:
 	  for(Card card : contents) {
 		  if(card instanceof GameCharacter) {
 			  characters.add((GameCharacter) card);
@@ -127,7 +163,7 @@ public class Estate extends Card {
 			  weapons.add((Weapon) card);
 		  }
 	  }
-	  
+	  // Draw characters:
 	  if(!characters.isEmpty()) {
 		  int index = 0;
 		  for(GameCharacter c : characters) {
@@ -136,7 +172,7 @@ public class Estate extends Card {
 			  index++;
 		  }
 	  }
-
+	  // Draw weapons:
 	  if(!weapons.isEmpty()) {
 		  int index = 0;
 		  for(Weapon w : weapons) {
@@ -148,8 +184,8 @@ public class Estate extends Card {
   }
 
 	/**
-	 * displays the name of the estate on the board.
-	 * @param g
+	 * Displays the name of the estate on the board.
+	 * @param g the Graphics object
 	 */
 	public void drawEstateName(Graphics g) {
 		float fSize = 15.0f;

@@ -4,11 +4,14 @@ import java.util.*;
 
 /**
  * Board represents the game's board, containing all Square data in a grid.
+ *
+ * @author johnh
  */
 public class Board {
 
-  /** Grid constants: */
+  /** Rows in grid. */
   public static final int ROWS = 24;
+  /** Columns in grid. */
   public static final int COLS = 24;
 
   /** Grid 2d array storing each Square (by row then column). */
@@ -16,7 +19,11 @@ public class Board {
 
 
   /**
-   * Constructs a new Board from a template String representing the starting board setup.
+   * Constructs a new board from a String template.
+   * Sets Character positions and places EstateSquares in Estates.
+   *
+   * @param characters game characters
+   * @param estates game estates
    */
   public Board(Map<Character, GameCharacter> characters, Map<Character, Estate> estates) {
     String template =
@@ -52,7 +59,12 @@ public class Board {
 
 
   /**
-   * Iterates through the template String, initiating all Squares in the representation.
+   * Iterates through the template String, initiating all Squares, placing characters,
+   * and adding EstateSquares to estates.
+   *
+   * @param template text representation of board.
+   * @param characters game characters.
+   * @param estates game estates.
    */
   private void initSquares(String template, Map<Character, GameCharacter> characters, Map<Character, Estate> estates) {
     // Split template into rows:
@@ -159,13 +171,23 @@ public class Board {
   }
 
 
+  /**
+   * Returns the Square at the specified position in the grid.
+   *
+   * @param row row number
+   * @param col column number
+   * @return Square if valid position, else null
+   */
   public Square getSquare(int row, int col){
     if (row < 0 || row >= Board.ROWS || col < 0 || col >= Board.COLS) return null;
     return grid[row][col];
   }
 
-  /*
-   * Draws the grid by calling draw on each square.
+  /**
+   * Draws the board by calling draw methods on Squares and
+   * drawing walls and entrances.
+   *
+   * @param g the Graphics object
    */
   public void drawBoard(Graphics g) {
     g.setColor(new Color(56,56,56));
@@ -179,23 +201,13 @@ public class Board {
       }
     }
 
-    // Draws the walls of the estates. Needs to be done after previous loop to stop overlapping of squares and sides.
+    // Draws the walls/entrances of the estates. Needs to be done after previous loop to stop overlapping of squares and sides.
     for(int row = 0; row < ROWS; row++) {
       for(int col = 0; col < COLS; col++) {
         Square s = grid[row][col];
         if(s instanceof EstateSquare) {
           EstateSquare es = (EstateSquare) s;
           es.drawEstateSide(g);
-        }
-      }
-    }
-
-    // Draws each entrance.
-    for(int row = 0; row < ROWS; row++) {
-      for(int col = 0; col < COLS; col++) {
-        Square s = grid[row][col];
-        if(s instanceof EstateSquare) {
-          EstateSquare es = (EstateSquare) s;
           es.drawEntrance(g);
         }
       }

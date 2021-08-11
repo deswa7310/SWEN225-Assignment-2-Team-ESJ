@@ -5,34 +5,57 @@ import java.awt.Graphics;
  * Each Square has a position.
  *
  * Square is extended by NormalSquare, WallSquare, and EstateSquare.
+ *
+ * @author johnh
  */
 public abstract class Square {
+    /** Square size when displaying. */
 	public static final int SIZE = 32;
-	// public static final int GAP = 5; unused 
+	/** Wall size (used for EstateSquares on edge of Estates). */
 	public static final int WALL = 20;
 
-    /** Position. */
-    public final int row, col;
+    /** Square's row on board grid. */
+    public final int row;
+    /** Square's column on board grid. */
+    public final int col;
 
-    /** Constructs a new Square with specified position on the grid: */
+    /**
+     * Constructs a new Square with the specified position:
+     * @param row row on board
+     * @param col column on board
+     */
     public Square(int row, int col){
         this.row = row;
         this.col = col;
     }
 
-    /** Returns true if a GameCharacter cannot move onto it: */
+    /**
+     * Returns true if GameCharacters cannot move onto it.
+     * @return true if blocked
+     */
     public abstract boolean isBlocked();
     
     /**
-     * displays square graphically
-     * @param g
+     * Displays the Square graphically.
+     * @param g the Graphics object
      */
     public abstract void drawSquare(Graphics g);
 
+    /**
+     * Gets the description of the Square and its contents to show in the popup
+     * when the mouse is hovered over it.
+     * @return the Square's description
+     */
     public abstract String getDescription();
 
-    /** Should not be accessible: */
+    /**
+     * Moves the specified character onto this Square.
+     * @param c character to be moved
+     */
     public void setCharacter(GameCharacter c){ throw new IllegalAccessError(); }
-    /** Should not be accessible: */
+
+    /**
+     * Removes the character from this Square (if there is one).
+     */
     public void removeCharacter(){ throw new IllegalAccessError(); }
 }

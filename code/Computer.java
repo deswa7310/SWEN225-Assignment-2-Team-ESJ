@@ -6,11 +6,17 @@ import java.util.stream.Collectors;
  * Computer is a subclass of Player describing an autonomous Player.
  * Upon its turn it always ends turn.
  * When refuting, it always chooses a random Card to reveal (if it has one).
+ *
+ * @author johnh
  */
 public class Computer extends Player {
 
     /**
-     * Constructs a new Computer with a specified number and character to control.
+     * Constructs a new Computer with a specified player number and character
+     * to control.
+     *
+     * @param number player number
+     * @param c character to control
      */
     public Computer(int number, GameCharacter c) {
         super(number, "Computer", c);

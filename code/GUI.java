@@ -10,18 +10,29 @@ import javax.swing.border.Border;
 
 /**
  * 
- * GUI initiates and controls the user interface.
+ * GUI initiates and controls the display of the user interface.
+ * It is an Observer of the Game class, updating the display whenever Game's
+ * data has been changed.
+ *
  * @author stefanjenkins
  *
  */
 public class GUI extends JFrame implements KeyListener, Observer {
 
-	public static final int SIZE = 808; // size of square JFrame
-
+	/** The base size of the original square JFrame. */
+	public static final int SIZE = 808;
+	/** The current Game being observed. */
 	private final Game game;
+	/** The custom JPanel on the right of the GUI used to display important text. */
 	private TextPanel textPanel;
+	/** The custom JPanel under the textPanel, used to contain buttons for available actions. */
 	private final InputPanel inputPanel;
 
+	/**
+	 * Constructs a new GUI object to display the given Game.
+	 * @param game Game to be displayed
+	 * @param input InputPanel with buttons for input
+	 */
 	public GUI(Game game, InputPanel input) {
 		this.game = game;
 		this.inputPanel = input;
@@ -29,6 +40,9 @@ public class GUI extends JFrame implements KeyListener, Observer {
 		initCloseDialog();
 	}
 
+	/**
+	 * Initializes the GUI, adding its components and positioning them.
+	 */
 	private void initUI() {
 		setSize((int) (SIZE * 1.5), SIZE + 100);
 		setFocusable(true);
@@ -41,6 +55,7 @@ public class GUI extends JFrame implements KeyListener, Observer {
 		textPanel = new TextPanel();
 		addKeyListener(this);
 
+		// Position and add drawPanel:
 		c.fill = GridBagConstraints.BOTH;
 		c.gridx = 0;
 		c.gridy = 0;
@@ -50,6 +65,7 @@ public class GUI extends JFrame implements KeyListener, Observer {
 		c.weighty = 1;
 		add(drawPanel, c);
 
+		// Position and add textPanel:
 		c.fill = GridBagConstraints.BOTH;
 		c.gridx = 3;
 		c.gridy = 0;
@@ -59,6 +75,7 @@ public class GUI extends JFrame implements KeyListener, Observer {
 		c.weighty = 0.2;
 		add(textPanel, c);
 
+		// Position and add inputPanel:
 		c.fill = GridBagConstraints.BOTH;
 		c.gridx = 3;
 		c.gridy = 1;
@@ -73,6 +90,10 @@ public class GUI extends JFrame implements KeyListener, Observer {
 		setVisible(true);
 	}
 
+	/**
+	 * Initializes the JOptionPane that pops up to confirm your choice
+	 * when attempting to close the GUI window.
+	 */
 	private void initCloseDialog(){
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
@@ -92,7 +113,7 @@ public class GUI extends JFrame implements KeyListener, Observer {
 	}
 
 	/*
-	 * Sets up menu bar.
+	 * Initializes the menu bar and adds menu items to it.
 	 */
 	private void initMenuBar() {
 		JMenuBar menuBar = new JMenuBar();
@@ -131,16 +152,19 @@ public class GUI extends JFrame implements KeyListener, Observer {
 	@Override
 	public void keyTyped(KeyEvent e) {
 	}
-
 	@Override
 	public void keyReleased(KeyEvent e) {
 	}
-
 	@Override
 	public void keyPressed(KeyEvent e) {
 		game.keyPressed(e);
 	}
 
+	/**
+	 * Creates and returns a JPanel with a stylised border.
+	 * @param lines true if lines should be added to border
+	 * @return a stylized JPanel
+	 */
 	public static JPanel createBorderedPanel(boolean lines) {
 		JPanel panel = new JPanel();
 		Border b = BorderFactory.createEmptyBorder(15, 15, 15, 15);
@@ -150,6 +174,11 @@ public class GUI extends JFrame implements KeyListener, Observer {
 		return panel;
 	}
 
+	/**
+	 * Creates and returns a JPanel with a JLabel using a big size font to display a specified String.
+	 * @param title String to be displayed
+	 * @return the title panel
+	 */
 	public static JPanel createTitlePanel(String title) {
 		final JPanel titlePanel = createBorderedPanel(true);
 		JLabel label = new JLabel(title);
@@ -160,15 +189,24 @@ public class GUI extends JFrame implements KeyListener, Observer {
 	}
 
 	/*
-	 * Displays the game board. Paint component of the GUI
+	 * DrawPanel is a custom JPanel displaying the graphics of the GUI.
+	 * It displays the game board and all game elements on it.
 	 */
 	private static class DrawPanel extends JPanel implements MouseListener, MouseMotionListener {
 
+		/** The current game. */
 		private final Game game;
+		/** Game over image. */
 		private static final Image gameOverPNG = loadImage("images/gameover.png");
+		/** Popup displayed when hovering mouse over DrawPanel. */
 		private final JPopupMenu popup = new JPopupMenu();
+		/** Item displayed in popup, containing Square description. */
 		private final JMenuItem popupItem = new JMenuItem("Hi");
 
+		/**
+		 * Constructs a new DrawPanel to display the game board.
+		 * @param game current Game
+		 */
 		public DrawPanel(Game game) {
 			this.game = game;
 			//this.setPreferredSize(new Dimension(200,200));
@@ -191,8 +229,10 @@ public class GUI extends JFrame implements KeyListener, Observer {
 			}
 		}
 
-		/*
-		 * Calls draw on each game aspect.
+		/**
+		 * Calls the board's draw method, along with draw methods for
+		 * each GameCharacter and Estate.
+		 * @param g the Graphics object
 		 */
 		private void drawGame(Graphics g) {
 			Graphics2D g2 = (Graphics2D) g;
@@ -211,19 +251,26 @@ public class GUI extends JFrame implements KeyListener, Observer {
 			}
 		}
 
+		/**
+		 * Draws the game over image at the end of the game.
+		 * @param g the Graphics object
+		 */
 		private void drawGameOver(Graphics g) {
 			g.drawImage(gameOverPNG, 20,20,GUI.SIZE-40,GUI.SIZE-40,null,null);
 		}
 
+		/**
+		 * Loads an weapon image and returns it.
+		 * @param filename image file name.
+		 * @return Image object of the image file.
+		 */
 		private static Image loadImage(String filename) {
-			// Using the URL means the image loads when stored
-			// in a jar or expanded into individual files.
 			java.net.URL imageURL = Weapon.class.getResource(filename);
+			// Attempt to load Image:
 			try {
 				return ImageIO.read(imageURL);
 			} catch (IOException e) {
-				// We've encountered an error loading the image. There's not much we
-				// can actually do at this point, except to abort the game.
+				// Throw exception if failed
 				throw new RuntimeException("Unable to load image: " + filename);
 			}
 		}
@@ -244,16 +291,19 @@ public class GUI extends JFrame implements KeyListener, Observer {
 		public void mouseDragged(MouseEvent e) {}
 		@Override
 		public void mouseMoved(MouseEvent e) {
-			if (game.configuring()) return;
+			if (game.configuring()) return; // don't allow mouse hovering popups during player configuration at start
 
+			// Calculate row and col of mouse position on board:
 			double row = (e.getY() - Square.WALL) * 1.0 / Square.SIZE;
 			double col = (e.getX() - Square.WALL) * 1.0 / Square.SIZE;
 
+			// If out of bounds, don't show popup.
 			if (row < 0 || row >= Board.ROWS || col < 0 || col >= Board.COLS){
 				popup.setVisible(false);
 				return;
 			}
 
+			// Else, show popup with description of the Square being hovered over:
 			popup.setVisible(true);
 			popupItem.setText(game.getBoard().getSquare((int)row, (int)col).getDescription());
 			popup.show(e.getComponent(), e.getX(), e.getY()-40);
@@ -261,10 +311,17 @@ public class GUI extends JFrame implements KeyListener, Observer {
 
 	}
 
+	/**
+	 * TextPanel is a custom JPanel on that displays important text during the game.
+	 */
 	private static class TextPanel extends JPanel {
 
+		/** The JTextArea used to display text. */
 		private final JTextArea textArea;
 
+		/**
+		 * Constructs a new TextPanel:
+		 */
 		public TextPanel() {
 			setFocusable(true);
 			setBackground(new Color(36,36,36));
@@ -276,6 +333,7 @@ public class GUI extends JFrame implements KeyListener, Observer {
 			textArea.setFont(new Font(f.getName(), f.getStyle(), 30));
 			textArea.setForeground(new Color(255, 255, 255));
 
+			// Customize the border to make it fancy:
 			Border b = BorderFactory.createEmptyBorder(15, 15, 15, 15);
 			b = BorderFactory.createCompoundBorder(b, BorderFactory.createLoweredBevelBorder());
 			b = BorderFactory.createCompoundBorder(b, BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -285,6 +343,7 @@ public class GUI extends JFrame implements KeyListener, Observer {
 			textArea.setBorder(b);
 			setLayout(new BorderLayout());
 
+			// Add a JScrollPane to allow scrolling if too much text:
 			JScrollPane scrollPane = new JScrollPane(textArea);
 			scrollPane.setPreferredSize(new Dimension(80, 80));
 			scrollPane.getViewport().setBackground(new Color(69, 69, 69));
@@ -293,7 +352,11 @@ public class GUI extends JFrame implements KeyListener, Observer {
 			textArea.setText("Welcome!");
 		}
 
-		protected void setText(String text){
+		/**
+		 * Sets the text to be displayed:
+		 * @param text custom text
+		 */
+		private void setText(String text){
 			textArea.setText(text);
 		}
 	}
