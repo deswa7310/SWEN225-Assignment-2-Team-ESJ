@@ -27,6 +27,8 @@ public class GUI extends JFrame implements KeyListener, Observer {
 	private TextPanel textPanel;
 	/** The custom JPanel under the textPanel, used to contain buttons for available actions. */
 	private final InputPanel inputPanel;
+	/** flag for whether or not the check button has been clicked by a player. */
+	public static boolean checkClicked = false;
 
 	/**
 	 * Constructs a new GUI object to display the given Game.
@@ -224,6 +226,14 @@ public class GUI extends JFrame implements KeyListener, Observer {
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
 			drawGame(g);
+			
+			//Draws players cards on panel if the checked button has been clicked.
+			if(GUI.checkClicked) {
+				Player p = game.getPlayers()[game.getCurrentPlayerIndex()];
+				p.drawHand(g);
+			}
+			
+			//Draws the game over image if the game has been ended.
 			if(game.gameOver()) {
 				drawGameOver(g);
 			}
