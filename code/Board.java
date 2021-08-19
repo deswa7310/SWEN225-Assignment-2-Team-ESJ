@@ -201,7 +201,7 @@ public class Board {
       }
     }
 
-    // Draws the walls/entrances of the estates. Need to be done in separate loops to prevent overlapping of drawings
+    // Draws the walls/entrances of the estates. Needs to be done in separate loops to prevent overlapping:
     for(int row = 0; row < ROWS; row++) {
       for(int col = 0; col < COLS; col++) {
         Square s = grid[row][col];

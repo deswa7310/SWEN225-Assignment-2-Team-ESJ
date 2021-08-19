@@ -20,7 +20,7 @@ public class Weapon extends Card {
   /** Shovel image representation. */
   private static final Image shovel = loadImage("images/shovel.png");
 
-  /** Al Weapon names: */
+  /** All Weapon names: */
   public enum Name {
     Broom, Scissors, Knife, Shovel, iPad
   }

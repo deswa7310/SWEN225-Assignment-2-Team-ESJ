@@ -1,7 +1,6 @@
-import javax.swing.*;
-
 import java.awt.Color;
 import java.awt.Graphics;
+import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -79,11 +78,10 @@ public class Player {
   public void startTurn(Game game, InputPanel input) {
     endedTurn = false;
     movesLeft = -1;
-    GUI.checkClicked = false;
     game.setChanged(nickname + "'s turn (" + character + "):");
 
     // Add a JButton to the InputPanel for each available action:
-    addCheckButton(input, game);
+    addCheckButton(game, input);
     if (!character.inEstate()) addRollButton(game, input);
     else {
       JButton guess = addGuessButton(game, input);
@@ -103,56 +101,15 @@ public class Player {
 
   /**
    * Adds a JButton that displays the Player's hand when pressed.
+   * @param game the current Game
    * @param input the InputPanel
    */
-  private void addCheckButton(InputPanel input, Game game){
-    JButton check = new JButton("Toggle Check Hand");
+  private void addCheckButton(Game game, InputPanel input){
+    JButton check = new JButton("Toggle Hand");
     check.addActionListener((event) -> {
-    	GUI.checkClicked = !GUI.checkClicked;
-    	game.setChanged("Player clicked check...");
-      
+      game.setChanged("Toggled hand display...");
     });
     input.addComponent(check);
-  }
-  
-  /**
-   * draws the Player's hand of cards onto the paint component panel.
-   * @param g
-   */
-  public void drawHand(Graphics g) {
-	  int index = 0;
-	  int size = Square.SIZE*6;
-	  int arcSize = Square.SIZE;
-	  int gap = Square.SIZE;
-	  int y = (16*Square.SIZE)+Square.WALL;
-	  Color detailColor = new Color(36,36,36);
-	  
-	  for(Card c: hand) {
-		  int x = (index*size) + Square.WALL + gap;
-		  String name = c.name;
-		  String type = "";
-		  Color color = null;
-		  if(c instanceof Estate) {
-			  type = "ESTATE";
-			  color = new Color(118,117,170);
-		  } else if(c instanceof GameCharacter) {
-			  type = "CHARACTER";
-			  color = new Color(163,190,156);
-		  } else {
-			  type = "WEAPON";
-			  color = new Color(177,131,128);
-		  }
-		  
-		  g.setColor(detailColor);
-		  g.fillRoundRect(x, y, size-gap, size, arcSize, arcSize);
-		  g.setColor(color);
-		  g.fillRoundRect(x+5, y+5, size-gap-10, size-10, arcSize, arcSize);
-		  
-		  g.setColor(detailColor);
-		  g.drawString(type, x+Square.SIZE, y+Square.SIZE);
-		  g.drawString(name, x+Square.SIZE, y+(Square.SIZE*3));
-		  index++;
-	  }
   }
 
   /**
@@ -448,6 +405,46 @@ public class Player {
       }
     }
     endedTurn = true;
+  }
+  
+  /**
+   * Draws the Player's hand of Cards onto the DrawPanel.
+   * @param g the Graphics object
+   */
+  public void drawHand(Graphics g) {
+	  int index = 0;
+	  int size = Square.SIZE*6;
+	  int arcSize = Square.SIZE;
+	  int gap = Square.SIZE;
+	  int y = (16*Square.SIZE)+Square.WALL;
+	  Color detailColor = new Color(36,36,36);
+
+	  for(Card c: hand) {
+		  int x = (index*size) + Square.WALL + gap;
+		  String name = c.name;
+		  String type = "";
+		  Color color = null;
+		  if(c instanceof Estate) {
+			  type = "ESTATE";
+			  color = new Color(118,117,170);
+		  } else if(c instanceof GameCharacter) {
+			  type = "CHARACTER";
+			  color = new Color(163,190,156);
+		  } else {
+			  type = "WEAPON";
+			  color = new Color(177,131,128);
+		  }
+
+		  g.setColor(detailColor);
+		  g.fillRoundRect(x, y, size-gap, size, arcSize, arcSize);
+		  g.setColor(color);
+		  g.fillRoundRect(x+5, y+5, size-gap-10, size-10, arcSize, arcSize);
+
+		  g.setColor(detailColor);
+		  g.drawString(type, x+Square.SIZE, y+Square.SIZE);
+		  g.drawString(name, x+Square.SIZE, y+(Square.SIZE*3));
+		  index++;
+	  }
   }
 
 
