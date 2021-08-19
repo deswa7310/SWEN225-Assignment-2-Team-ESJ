@@ -27,8 +27,8 @@ public class GUI extends JFrame implements KeyListener, Observer {
 	private TextPanel textPanel;
 	/** The custom JPanel under the textPanel, used to contain buttons for available actions. */
 	private final InputPanel inputPanel;
-	/** flag for whether or not the check button has been clicked by a player. */
-	public static boolean checkClicked = false;
+	/** Flag for whether or not the Player's hand should be displayed. */
+	private boolean drawHand = false;
 
 	/**
 	 * Constructs a new GUI object to display the given Game.
@@ -114,7 +114,7 @@ public class GUI extends JFrame implements KeyListener, Observer {
 		});
 	}
 
-	/*
+	/**
 	 * Initializes the menu bar and adds menu items to it.
 	 */
 	private void initMenuBar() {
@@ -143,12 +143,14 @@ public class GUI extends JFrame implements KeyListener, Observer {
 
 	@Override
 	public void update(Observable o, Object arg) {
-		repaint();
 		if (arg instanceof String) {
 			String text = (String) arg;
 			if (text.equals("close")) System.exit(-1);
+			else if (text.equals("Toggled hand display...")) drawHand = !drawHand;
+			else if (text.endsWith("):")) drawHand = false;
 			textPanel.setText(text);
 		}
+		repaint();
 	}
 
 	@Override
@@ -190,16 +192,16 @@ public class GUI extends JFrame implements KeyListener, Observer {
 		return titlePanel;
 	}
 
-	/*
+	/**
 	 * DrawPanel is a custom JPanel displaying the graphics of the GUI.
 	 * It displays the game board and all game elements on it.
 	 */
-	private static class DrawPanel extends JPanel implements MouseListener, MouseMotionListener {
+	private class DrawPanel extends JPanel implements MouseListener, MouseMotionListener {
 
 		/** The current game. */
 		private final Game game;
 		/** Game over image. */
-		private static final Image gameOverPNG = loadImage("images/gameover.png");
+		private final Image gameOverPNG = loadImage("images/gameover.png");
 		/** Popup displayed when hovering mouse over DrawPanel. */
 		private final JPopupMenu popup = new JPopupMenu();
 		/** Item displayed in popup, containing Square description. */
@@ -226,14 +228,10 @@ public class GUI extends JFrame implements KeyListener, Observer {
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
 			drawGame(g);
-			
-			//Draws players cards on panel if the checked button has been clicked.
-			if(GUI.checkClicked) {
+			if(drawHand && game.getPlayers() != null) {
 				Player p = game.getPlayers()[game.getCurrentPlayerIndex()];
 				p.drawHand(g);
 			}
-			
-			//Draws the game over image if the game has been ended.
 			if(game.gameOver()) {
 				drawGameOver(g);
 			}
@@ -274,7 +272,7 @@ public class GUI extends JFrame implements KeyListener, Observer {
 		 * @param filename image file name.
 		 * @return Image object of the image file.
 		 */
-		private static Image loadImage(String filename) {
+		private Image loadImage(String filename) {
 			java.net.URL imageURL = Weapon.class.getResource(filename);
 			// Attempt to load Image:
 			try {
