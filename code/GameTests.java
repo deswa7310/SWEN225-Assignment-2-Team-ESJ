@@ -2,7 +2,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -46,7 +45,7 @@ public class GameTests {
 		for (int row = 0; row < Board.ROWS; row++) {
 			for (int col = 0; col < Board.COLS; col++) {
 				Square s = board.getSquare(row, col);
-				if (s == null) fail(); // if Square not initialized, fail
+				assertTrue(s != null); // if Square not initialized, fail
 			}
 		}
 	}
